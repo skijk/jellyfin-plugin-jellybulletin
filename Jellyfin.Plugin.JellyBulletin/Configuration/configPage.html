@@ -31,6 +31,17 @@
                             <input id="BulletinTitle" is="emby-input" maxlength="160" required />
                         </div>
 
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="BulletinImageUrl">Bildadress (valfritt)</label>
+                            <input id="BulletinImageUrl"
+                                   is="emby-input"
+                                   type="url"
+                                   inputmode="url"
+                                   placeholder="https://…"
+                                   maxlength="2048" />
+                            <div class="fieldDescription">Bilden visas bredvid texten. Adressen måste börja med https:// eller http://.</div>
+                        </div>
+
                         <div class="bulletin-toolbar" role="toolbar" aria-label="Textformatering">
                             <button type="button" data-command="bold"><strong>B</strong></button>
                             <button type="button" data-command="italic"><em>I</em></button>
@@ -173,6 +184,7 @@
                 page.querySelector('#BulletinEditorPanel').hidden = !item;
                 if (!item) return;
                 page.querySelector('#BulletinTitle').value = value(item, 'Title', 'title') || '';
+                page.querySelector('#BulletinImageUrl').value = value(item, 'ImageUrl', 'imageUrl') || '';
                 page.querySelector('#BulletinPublished').checked = Boolean(value(item, 'IsPublished', 'isPublished'));
                 const editor = page.querySelector('#BulletinEditor');
                 editor.replaceChildren();
@@ -223,6 +235,12 @@
                     return false;
                 }
                 item.Title = title;
+                const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
+                if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+                    Dashboard.alert('Bildadressen måste börja med http:// eller https://');
+                    return false;
+                }
+                item.ImageUrl = imageUrl || null;
                 item.Blocks = serializeEditor();
                 item.IsPublished = page.querySelector('#BulletinPublished').checked;
                 item.PublishedAt ||= new Date().toISOString();
@@ -257,7 +275,7 @@
             });
             ['keydown', 'keyup', 'keypress'].forEach(eventName => {
                 page.addEventListener(eventName, event => {
-                    if (event.target.closest?.('#BulletinTitle, #BulletinEditor')) {
+                    if (event.target.closest?.('#BulletinTitle, #BulletinImageUrl, #BulletinEditor')) {
                         event.stopImmediatePropagation();
                     }
                 }, true);
@@ -275,6 +293,7 @@
                 const item = {
                     Id: id,
                     Title: '',
+                    ImageUrl: null,
                     Blocks: [{ Type: 'paragraph', Content: [], Items: [] }],
                     PublishedAt: new Date().toISOString(),
                     UpdatedAt: new Date().toISOString(),

@@ -9,6 +9,8 @@ public sealed class BulletinItem
 
     public string Title { get; set; } = string.Empty;
 
+    public string? ImageUrl { get; set; }
+
     public List<BulletinBlock> Blocks { get; set; } = [];
 
     public DateTimeOffset PublishedAt { get; set; }

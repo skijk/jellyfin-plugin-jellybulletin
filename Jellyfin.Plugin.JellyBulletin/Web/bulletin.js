@@ -3,6 +3,19 @@
 
     const ROOT_ID = 'jellyfinBulletin';
     let lastSignature = '';
+    let lastData = null;
+    let refreshTimer = null;
+
+    function findHome() {
+        return document.querySelector(
+            '#indexPage:not(.hide) .homeSectionsContainer, ' +
+            '#indexPage:not(.hide) .sections, ' +
+            '#indexPage:not(.hide) .content-primary, ' +
+            '.homePage:not(.hide) .homeSectionsContainer, ' +
+            '.homePage:not(.hide) .sections, ' +
+            '.homePage:not(.hide) .content-primary'
+        );
+    }
 
     function createInline(run) {
         let element = document.createElement('span');
@@ -66,8 +79,15 @@
             return;
         }
 
+        const home = findHome();
+        if (!home) return;
+
         const signature = JSON.stringify(items);
-        if (signature === lastSignature && document.getElementById(ROOT_ID)) return;
+        const existing = document.getElementById(ROOT_ID);
+        if (signature === lastSignature && existing) {
+            if (existing.parentElement !== home) home.prepend(existing);
+            return;
+        }
         lastSignature = signature;
 
         const root = document.createElement('section');
@@ -75,14 +95,22 @@
         root.className = 'jellyfin-bulletin';
         root.setAttribute('aria-label', 'Nyheter');
 
+        const feature = document.createElement('div');
+        feature.className = 'bulletin-feature';
+
         const body = document.createElement('article');
         body.className = 'bulletin-active';
         const title = document.createElement('h2');
         const date = document.createElement('time');
         const contentHost = document.createElement('div');
+        const image = document.createElement('img');
+        image.className = 'bulletin-image';
+        image.loading = 'lazy';
+        image.hidden = true;
 
         body.append(title, date, contentHost);
-        root.append(body);
+        feature.append(body, image);
+        root.append(feature);
 
         const tabs = document.createElement('div');
         tabs.className = 'bulletin-tabs';
@@ -100,6 +128,18 @@
                 day: 'numeric'
             }).format(new Date(published));
             contentHost.replaceChildren(createContent(item));
+            const imageUrl = item.ImageUrl || item.imageUrl;
+            if (imageUrl && /^https?:\/\//i.test(imageUrl)) {
+                image.src = imageUrl;
+                image.alt = item.Title || item.title || '';
+                image.hidden = false;
+                feature.classList.add('has-image');
+            } else {
+                image.removeAttribute('src');
+                image.alt = '';
+                image.hidden = true;
+                feature.classList.remove('has-image');
+            }
             [...tabs.children].forEach((button, buttonIndex) => {
                 button.setAttribute('aria-selected', String(buttonIndex === index));
             });
@@ -117,14 +157,11 @@
 
         select(0);
         document.getElementById(ROOT_ID)?.remove();
-
-        const home = document.querySelector('.homeSectionsContainer, .sections, #indexPage .content-primary');
-        if (home) home.prepend(root);
+        home.prepend(root);
     }
 
     async function refresh() {
-        const homeVisible = document.querySelector('#indexPage:not(.hide), .homePage:not(.hide)');
-        if (!homeVisible) return;
+        if (!findHome()) return;
 
         try {
             const data = await ApiClient.ajax({
@@ -132,14 +169,28 @@
                 url: ApiClient.getUrl('Bulletin/News'),
                 dataType: 'json'
             });
+            lastData = data;
             render(data);
         } catch (error) {
             console.debug('Bulletin could not load', error);
         }
     }
 
+    function maintainWidget() {
+        if (!findHome()) return;
+        if (lastData) render(lastData);
+        if (!lastData || !document.getElementById(ROOT_ID)) {
+            clearTimeout(refreshTimer);
+            refreshTimer = setTimeout(refresh, 100);
+        }
+    }
+
     document.addEventListener('viewshow', refresh);
     window.addEventListener('hashchange', refresh);
+    new MutationObserver(maintainWidget).observe(document.body, {
+        childList: true,
+        subtree: true
+    });
     setInterval(refresh, 15000);
     refresh();
 })();
