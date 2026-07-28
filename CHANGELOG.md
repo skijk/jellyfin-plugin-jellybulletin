@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.2.0 — Public beta
+
+- Replace inconsistent browser-native date controls with stable text fields.
+- Validate the explicit local format `YYYY-MM-DD HH:mm` before saving.
+
 ## 0.3.1.0 — Public beta
 
 - Fix invalid-value errors in publish and unpublish date/time fields.

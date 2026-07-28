@@ -151,15 +151,19 @@
                                 <label class="inputLabel inputLabelUnfocused" for="BulletinPublishAt">Publish at (optional)</label>
                                 <input id="BulletinPublishAt"
                                        class="emby-input bulletin-datetime-input"
-                                       type="datetime-local"
-                                       step="60" />
+                                       type="text"
+                                       inputmode="numeric"
+                                       autocomplete="off"
+                                       placeholder="YYYY-MM-DD HH:mm" />
                             </div>
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabelUnfocused" for="BulletinUnpublishAt">Unpublish at (optional)</label>
                                 <input id="BulletinUnpublishAt"
                                        class="emby-input bulletin-datetime-input"
-                                       type="datetime-local"
-                                       step="60" />
+                                       type="text"
+                                       inputmode="numeric"
+                                       autocomplete="off"
+                                       placeholder="YYYY-MM-DD HH:mm" />
                             </div>
                         </div>
                         <div class="fieldDescription">
@@ -244,9 +248,24 @@
                 if (!date) return '';
                 const parsed = new Date(date);
                 const local = new Date(parsed.getTime() - parsed.getTimezoneOffset() * 60000);
-                return local.toISOString().slice(0, 16);
+                return local.toISOString().slice(0, 16).replace('T', ' ');
             };
-            const fromLocalDateTime = value => value ? new Date(value).toISOString() : null;
+            const fromLocalDateTime = input => {
+                const text = input.trim();
+                if (!text) return null;
+                const match = text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/);
+                if (!match) throw new Error('Use the date and time format YYYY-MM-DD HH:mm.');
+                const [, year, month, day, hour, minute] = match.map(Number);
+                const parsed = new Date(year, month - 1, day, hour, minute, 0, 0);
+                if (parsed.getFullYear() !== year
+                    || parsed.getMonth() !== month - 1
+                    || parsed.getDate() !== day
+                    || parsed.getHours() !== hour
+                    || parsed.getMinutes() !== minute) {
+                    throw new Error('Enter a valid local date and time.');
+                }
+                return parsed.toISOString();
+            };
             const validImageUrl = url =>
                 /^https?:\/\//i.test(url || '')
                 || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
@@ -591,8 +610,13 @@
                         if (entry !== item) entry.IsPinned = false;
                     });
                 }
-                item.PublishAt = fromLocalDateTime(page.querySelector('#BulletinPublishAt').value);
-                item.UnpublishAt = fromLocalDateTime(page.querySelector('#BulletinUnpublishAt').value);
+                try {
+                    item.PublishAt = fromLocalDateTime(page.querySelector('#BulletinPublishAt').value);
+                    item.UnpublishAt = fromLocalDateTime(page.querySelector('#BulletinUnpublishAt').value);
+                } catch (error) {
+                    Dashboard.alert(error.message);
+                    return false;
+                }
                 if (item.PublishAt && item.UnpublishAt
                     && new Date(item.UnpublishAt) <= new Date(item.PublishAt)) {
                     Dashboard.alert('The unpublish time must be later than the publish time.');
