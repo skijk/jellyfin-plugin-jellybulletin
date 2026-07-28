@@ -172,7 +172,7 @@
 
                         <div class="bulletin-editor-actions">
                             <button is="emby-button" type="button" class="raised button-submit" id="BulletinApply">
-                                Apply changes
+                                Save bulletin
                             </button>
                             <button is="emby-button" type="button" class="raised button-delete" id="BulletinDelete">
                                 Delete
@@ -183,7 +183,7 @@
 
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block">
-                        Save all
+                        Save all settings
                     </button>
                 </div>
             </form>
@@ -750,7 +750,9 @@
                 loadEditor(item);
                 page.querySelector('#BulletinTitle').focus();
             });
-            page.querySelector('#BulletinApply').addEventListener('click', applyEditor);
+            page.querySelector('#BulletinApply').addEventListener('click', () => {
+                page.querySelector('#BulletinForm').requestSubmit();
+            });
             page.querySelector('#BulletinDelete').addEventListener('click', () => {
                 if (!current() || !window.confirm('Delete this bulletin?')) return;
                 items = items.filter(item => value(item, 'Id', 'id') !== selectedId);

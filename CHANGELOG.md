@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.3.0 — Public beta
+
+- Replace the local-only **Apply changes** action with **Save bulletin**.
+- Persist and verify bulletin edits immediately without a second save action.
+
 ## 0.3.2.0 — Public beta
 
 - Replace inconsistent browser-native date controls with stable text fields.
