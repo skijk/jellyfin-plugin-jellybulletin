@@ -50,7 +50,7 @@
                                 </button>
                             </div>
                             <div id="BulletinImagePreviewWrap" class="bulletin-image-preview-wrap" hidden>
-                                <img id="BulletinImagePreview" alt="Image preview" />
+                                <img id="BulletinImagePreview" class="bulletin-image-preview" alt="Image preview" />
                                 <button is="emby-button" type="button" class="raised button-delete" id="BulletinRemoveImage">
                                     Remove image
                                 </button>
@@ -138,13 +138,13 @@
         .bulletin-rich-editor:empty::before { content:attr(data-placeholder); opacity:.5; }
         .bulletin-image-drop { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.75rem; margin:.65rem 0; padding:1rem; border:2px dashed rgba(255,255,255,.25); border-radius:.6rem; cursor:pointer; }
         .bulletin-image-drop:focus,.bulletin-image-drop.is-dragging { border-color:#00a4dc; outline:none; background:rgba(0,164,220,.08); }
-        .bulletin-image-preview-wrap { display:grid; grid-template-columns:minmax(0,22rem) auto; align-items:end; gap:.75rem; margin:.75rem 0; }
-        .bulletin-image-preview { display:block; width:100%; max-height:14rem; object-fit:cover; border-radius:.5rem; }
+        .bulletin-image-preview-wrap { display:flex; flex-wrap:wrap; align-items:flex-end; gap:.75rem; width:fit-content; max-width:100%; margin:.75rem 0; }
+        .bulletin-image-preview { display:block; width:auto; max-width:min(20rem,100%); height:auto; max-height:10rem; object-fit:contain; border-radius:.5rem; background:rgba(0,0,0,.2); }
         .bulletin-live-preview { --bulletin-accent:var(--jf-palette-primary-main,#00a4dc); margin:1.5rem 0; overflow:hidden; border:1px solid rgba(255,255,255,.14); border-radius:1rem; background:radial-gradient(circle at 100% 0,rgba(0,164,220,.18),transparent 42%),rgba(24,24,24,.92); box-shadow:0 .75rem 2rem rgba(0,0,0,.18); }
         .bulletin-preview-label { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; padding:.85rem 1.2rem; border-bottom:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.22); }
         .bulletin-preview-label h2 { margin:0; font-size:1rem; }
         .bulletin-preview-label span { opacity:.58; font-size:.8rem; }
-        .bulletin-preview-feature { display:grid; grid-template-columns:minmax(0,1fr); height:20rem; overflow:hidden; }
+        .bulletin-preview-feature { display:grid; grid-template-columns:minmax(0,1fr); width:100%; aspect-ratio:45 / 11; overflow:hidden; }
         .bulletin-preview-feature.has-image { grid-template-columns:minmax(0,1.25fr) minmax(15rem,.75fr); }
         .bulletin-preview-copy { min-width:0; overflow-y:auto; padding:clamp(1.2rem,3vw,2.25rem); scrollbar-width:thin; }
         .bulletin-preview-copy h3 { margin:0 0 .3rem; font-size:clamp(1.45rem,3vw,2.2rem); line-height:1.15; }
@@ -159,8 +159,8 @@
         .bulletin-preview-navigation span { display:grid; place-items:center; width:2.15rem; height:2.15rem; border:1px solid rgba(255,255,255,.16); border-radius:50%; background:rgba(255,255,255,.07); font-size:1.55rem; }
         .bulletin-preview-navigation small { min-width:3.5rem; opacity:.68; text-align:center; }
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
-        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; } .bulletin-home-image-preview { order:-1; height:11rem; border-inline-start:0; border-bottom:1px solid rgba(255,255,255,.1); } }
-        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-image-preview-wrap { grid-template-columns:1fr; } .bulletin-preview-feature { height:27rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } }
+        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-home-image-preview { order:-1; height:10rem; border-inline-start:0; border-bottom:1px solid rgba(255,255,255,.1); } }
+        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } }
     </style>
 
     <script type="text/javascript">
