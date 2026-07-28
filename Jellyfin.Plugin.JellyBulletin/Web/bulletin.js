@@ -98,7 +98,7 @@
         const root = document.createElement('section');
         root.id = ROOT_ID;
         root.className = 'jellyfin-bulletin';
-        root.setAttribute('aria-label', 'Nyheter');
+        root.setAttribute('aria-label', 'News');
 
         const feature = document.createElement('div');
         feature.className = 'bulletin-feature';

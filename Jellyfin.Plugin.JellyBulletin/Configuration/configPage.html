@@ -6,10 +6,10 @@
         <div class="content-primary">
             <form id="BulletinForm">
                 <h1>JellyBulletin</h1>
-                <p>Publicera nyheter och driftmeddelanden till alla användare.</p>
+                <p>Publish news and service announcements to every user.</p>
 
                 <div class="selectContainer">
-                    <label class="selectLabel" for="BulletinVisibleCount">Antal nyheter på startsidan</label>
+                    <label class="selectLabel" for="BulletinVisibleCount">News items on the home screen</label>
                     <select id="BulletinVisibleCount" is="emby-select" class="emby-select-withcolor emby-select">
                         <option value="3">3</option>
                         <option value="4">4</option>
@@ -20,19 +20,19 @@
                 <div class="bulletin-admin-layout">
                     <aside>
                         <button is="emby-button" type="button" class="raised button-submit block" id="BulletinNew">
-                            Ny nyhet
+                            New bulletin
                         </button>
                         <div id="BulletinItems"></div>
                     </aside>
 
                     <main id="BulletinEditorPanel" hidden>
                         <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="BulletinTitle">Rubrik</label>
+                            <label class="inputLabel inputLabelUnfocused" for="BulletinTitle">Title</label>
                             <input id="BulletinTitle" is="emby-input" maxlength="160" required />
                         </div>
 
                         <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="BulletinImageUrl">Bild (valfritt)</label>
+                            <label class="inputLabel inputLabelUnfocused" for="BulletinImageUrl">Image (optional)</label>
                             <input id="BulletinImageUrl"
                                    is="emby-input"
                                    type="text"
@@ -44,29 +44,29 @@
                                    accept="image/png,image/jpeg,image/webp"
                                    hidden />
                             <div id="BulletinImageDrop" class="bulletin-image-drop" tabindex="0">
-                                <span>Klistra in en bild med <kbd>⌘V</kbd>, dra den hit eller välj en fil.</span>
+                                <span>Paste an image with <kbd>⌘V</kbd>, drop it here, or choose a file.</span>
                                 <button is="emby-button" type="button" class="raised" id="BulletinChooseImage">
-                                    Välj bild
+                                    Choose image
                                 </button>
                             </div>
                             <div id="BulletinImagePreviewWrap" class="bulletin-image-preview-wrap" hidden>
-                                <img id="BulletinImagePreview" alt="Förhandsvisning" />
+                                <img id="BulletinImagePreview" alt="Image preview" />
                                 <button is="emby-button" type="button" class="raised button-delete" id="BulletinRemoveImage">
-                                    Ta bort bild
+                                    Remove image
                                 </button>
                             </div>
-                            <div class="fieldDescription">PNG, JPEG eller WebP, högst 8 MB. Du kan också använda en https://-adress.</div>
+                            <div class="fieldDescription">PNG, JPEG or WebP, up to 8 MB. You can also use an HTTP or HTTPS URL.</div>
                         </div>
 
-                        <div class="bulletin-toolbar" role="toolbar" aria-label="Textformatering">
+                        <div class="bulletin-toolbar" role="toolbar" aria-label="Text formatting">
                             <button type="button" data-command="bold"><strong>B</strong></button>
                             <button type="button" data-command="italic"><em>I</em></button>
                             <button type="button" data-command="underline"><u>U</u></button>
-                            <label>Färg <input type="color" id="BulletinColor" value="#ffffff" /></label>
-                            <button type="button" id="BulletinLink">Länk</button>
-                            <button type="button" data-command="insertUnorderedList">• Lista</button>
-                            <button type="button" data-command="insertOrderedList">1. Lista</button>
-                            <button type="button" data-command="removeFormat">Rensa format</button>
+                            <label>Color <input type="color" id="BulletinColor" value="#ffffff" /></label>
+                            <button type="button" id="BulletinLink">Link</button>
+                            <button type="button" data-command="insertUnorderedList">• List</button>
+                            <button type="button" data-command="insertOrderedList">1. List</button>
+                            <button type="button" data-command="removeFormat">Clear formatting</button>
                         </div>
 
                         <div id="BulletinEditor"
@@ -77,22 +77,22 @@
                              onkeydown="event.stopImmediatePropagation()"
                              onkeyup="event.stopImmediatePropagation()"
                              onkeypress="event.stopImmediatePropagation()"
-                             data-placeholder="Skriv nyheten här…"></div>
+                             data-placeholder="Write the bulletin here…"></div>
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label class="emby-checkbox-label">
                                 <input id="BulletinPublished" type="checkbox" is="emby-checkbox" />
-                                <span>Publicerad</span>
+                                <span>Published</span>
                             </label>
-                            <div class="fieldDescription">Publicerade nyheter visas omedelbart för alla användare.</div>
+                            <div class="fieldDescription">Published bulletins are immediately visible to every user.</div>
                         </div>
 
                         <div class="bulletin-editor-actions">
                             <button is="emby-button" type="button" class="raised button-submit" id="BulletinApply">
-                                Tillämpa ändringar
+                                Apply changes
                             </button>
                             <button is="emby-button" type="button" class="raised button-delete" id="BulletinDelete">
-                                Ta bort
+                                Delete
                             </button>
                         </div>
                     </main>
@@ -100,7 +100,7 @@
 
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block">
-                        Spara allt
+                        Save all
                     </button>
                 </div>
             </form>
@@ -198,11 +198,11 @@
 
             async function uploadImage(file) {
                 if (!file || !/^image\/(png|jpeg|webp)$/i.test(file.type)) {
-                    Dashboard.alert('Välj en PNG-, JPEG- eller WebP-bild.');
+                    Dashboard.alert('Choose a PNG, JPEG, or WebP image.');
                     return;
                 }
                 if (file.size > 8 * 1024 * 1024) {
-                    Dashboard.alert('Bilden får vara högst 8 MB.');
+                    Dashboard.alert('The image must not exceed 8 MB.');
                     return;
                 }
 
@@ -220,7 +220,7 @@
                     });
                     if (!response.ok) {
                         const failure = await response.json().catch(() => ({}));
-                        throw new Error(value(failure, 'Error', 'error') || 'Uppladdningen misslyckades.');
+                        throw new Error(value(failure, 'Error', 'error') || 'The upload failed.');
                     }
 
                     const result = await response.json();
@@ -230,7 +230,7 @@
                     const item = current();
                     if (item) item.ImageUrl = url;
                 } catch (error) {
-                    Dashboard.alert(error.message || 'Uppladdningen misslyckades.');
+                    Dashboard.alert(error.message || 'The upload failed.');
                 } finally {
                     Dashboard.hideLoadingMsg();
                 }
@@ -336,9 +336,9 @@
                     button.className = 'bulletin-item-button';
                     button.setAttribute('aria-current', String(value(item, 'Id', 'id') === selectedId));
                     const title = document.createElement('span');
-                    title.textContent = value(item, 'Title', 'title') || 'Namnlöst utkast';
+                    title.textContent = value(item, 'Title', 'title') || 'Untitled draft';
                     const state = document.createElement('small');
-                    state.textContent = value(item, 'IsPublished', 'isPublished') ? 'Publicerad' : 'Utkast';
+                    state.textContent = value(item, 'IsPublished', 'isPublished') ? 'Published' : 'Draft';
                     button.append(title, state);
                     button.addEventListener('click', () => {
                         if (selectedId !== value(item, 'Id', 'id') && !applyEditor()) return;
@@ -355,13 +355,13 @@
                 if (!item) return true;
                 const title = page.querySelector('#BulletinTitle').value.trim();
                 if (!title) {
-                    Dashboard.alert('Rubriken får inte vara tom.');
+                    Dashboard.alert('The title cannot be empty.');
                     return false;
                 }
                 item.Title = title;
                 const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
                 if (imageUrl && !validImageUrl(imageUrl)) {
-                    Dashboard.alert('Använd en uppladdad bild eller en adress som börjar med http:// eller https://');
+                    Dashboard.alert('Use an uploaded image or a URL that starts with http:// or https://.');
                     return false;
                 }
                 item.ImageUrl = imageUrl || null;
@@ -448,9 +448,9 @@
                 if (item) item.ImageUrl = null;
             });
             page.querySelector('#BulletinLink').addEventListener('click', () => {
-                const url = window.prompt('Länkens adress (https://…)');
+                const url = window.prompt('Link URL (https://…)');
                 if (url && /^https?:\/\//i.test(url)) document.execCommand('createLink', false, url);
-                else if (url) Dashboard.alert('Länken måste börja med http:// eller https://');
+                else if (url) Dashboard.alert('The link must start with http:// or https://.');
             });
             page.querySelector('#BulletinNew').addEventListener('click', () => {
                 const id = crypto.randomUUID().replaceAll('-', '');
@@ -471,7 +471,7 @@
             });
             page.querySelector('#BulletinApply').addEventListener('click', applyEditor);
             page.querySelector('#BulletinDelete').addEventListener('click', () => {
-                if (!current() || !window.confirm('Ta bort den här nyheten?')) return;
+                if (!current() || !window.confirm('Delete this bulletin?')) return;
                 items = items.filter(item => value(item, 'Id', 'id') !== selectedId);
                 selectedId = items.length ? value(items[0], 'Id', 'id') : null;
                 renderList();
@@ -500,7 +500,7 @@
                     });
                     const verifiedItems = (value(verification, 'Items', 'items') || []).map(normalizeItem);
                     if (contentSignature(verifiedItems) !== expectedSignature) {
-                        throw new Error('Servern returnerade inte de sparade ändringarna.');
+                        throw new Error('The server did not return the saved changes.');
                     }
                     items = verifiedItems;
                     renderList();
@@ -508,7 +508,7 @@
                     window.dispatchEvent(new CustomEvent('jellyfin-bulletin-refresh'));
                     Dashboard.processPluginConfigurationUpdateResult();
                 } catch (error) {
-                    Dashboard.alert(error.message || 'Nyheten kunde inte sparas.');
+                    Dashboard.alert(error.message || 'The bulletin could not be saved.');
                 } finally {
                     Dashboard.hideLoadingMsg();
                 }
