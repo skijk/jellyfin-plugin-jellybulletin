@@ -149,12 +149,21 @@
                         <div class="bulletin-schedule-grid">
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabelUnfocused" for="BulletinPublishAt">Publish at (optional)</label>
-                                <input id="BulletinPublishAt" is="emby-input" type="datetime-local" />
+                                <input id="BulletinPublishAt"
+                                       class="emby-input bulletin-datetime-input"
+                                       type="datetime-local"
+                                       step="60" />
                             </div>
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabelUnfocused" for="BulletinUnpublishAt">Unpublish at (optional)</label>
-                                <input id="BulletinUnpublishAt" is="emby-input" type="datetime-local" />
+                                <input id="BulletinUnpublishAt"
+                                       class="emby-input bulletin-datetime-input"
+                                       type="datetime-local"
+                                       step="60" />
                             </div>
+                        </div>
+                        <div class="fieldDescription">
+                            Times use your browser timezone: <span id="BulletinTimezone">Local time</span>.
                         </div>
 
                         <div class="bulletin-editor-actions">
@@ -216,6 +225,7 @@
         .bulletin-preview-navigation small { min-width:3.5rem; opacity:.68; text-align:center; }
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
         .bulletin-schedule-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+        .bulletin-datetime-input { box-sizing:border-box; width:100%; min-height:2.8rem; padding:.55rem .7rem; border:1px solid var(--jf-palette-divider,rgba(255,255,255,.2)); border-radius:.25rem; background:var(--jf-palette-background-paper,rgba(255,255,255,.14)); color:inherit; }
         @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-home-image-preview { order:-1; height:10rem; border-inline-start:0; border-bottom:1px solid var(--bulletin-divider); } }
         @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } .bulletin-schedule-grid { grid-template-columns:1fr; } }
     </style>
@@ -225,6 +235,8 @@
             const page = document.querySelector('#BulletinConfigPage');
             let items = [];
             let selectedId = null;
+            page.querySelector('#BulletinTimezone').textContent =
+                Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local time';
 
             const value = (object, upper, lower) => object?.[upper] ?? object?.[lower];
             const current = () => items.find(item => value(item, 'Id', 'id') === selectedId);

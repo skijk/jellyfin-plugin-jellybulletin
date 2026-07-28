@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.1.0 — Public beta
+
+- Fix invalid-value errors in publish and unpublish date/time fields.
+- Show the browser timezone used to interpret scheduling values.
+
 ## 0.3.0.0 — Public beta
 
 - Add configurable automatic rotation and rotation intervals.
