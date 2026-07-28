@@ -1,5 +1,9 @@
 # JellyBulletin
 
+<p align="center">
+  <img src="logo.png" alt="JellyBulletin" width="220">
+</p>
+
 **News and announcements for Jellyfin.**
 
 JellyBulletin displays rich news and service messages on the Jellyfin home

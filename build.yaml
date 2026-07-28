@@ -12,4 +12,5 @@ category: "General"
 owner: "SKYNET"
 artifacts:
 - "Jellyfin.Plugin.JellyBulletin.dll"
+- "logo.png"
 changelog: "Prevent Jellyfin keyboard shortcuts while typing a bulletin."
