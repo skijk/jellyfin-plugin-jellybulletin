@@ -1,7 +1,7 @@
 ---
 name: "JellyBulletin"
 guid: "6ad77d9a-e157-4ca2-82e7-a114f86a5f50"
-version: "0.2.2.0"
+version: "0.2.3.0"
 targetAbi: "10.11.11.0"
 framework: "net9.0"
 overview: "News and announcements for Jellyfin."
@@ -13,4 +13,4 @@ owner: "SKYNET"
 artifacts:
 - "Jellyfin.Plugin.JellyBulletin.dll"
 - "logo.png"
-changelog: "Normalize editor data and verify text and image changes after every save."
+changelog: "Remove false save warnings and add JellyBulletin to the Dashboard plugin menu."

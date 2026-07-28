@@ -171,13 +171,16 @@
             }
 
             function contentSignature(collection) {
-                return JSON.stringify(collection.map(item => ({
-                    Id: item.Id,
-                    Title: item.Title,
-                    ImageUrl: item.ImageUrl || null,
-                    Blocks: item.Blocks,
-                    IsPublished: item.IsPublished
-                })));
+                return JSON.stringify(collection
+                    .map(normalizeItem)
+                    .map(item => ({
+                        Id: item.Id,
+                        Title: item.Title,
+                        ImageUrl: item.ImageUrl,
+                        Blocks: item.Blocks,
+                        IsPublished: item.IsPublished
+                    }))
+                    .sort((left, right) => left.Id.localeCompare(right.Id)));
             }
 
             function showImagePreview(url) {
