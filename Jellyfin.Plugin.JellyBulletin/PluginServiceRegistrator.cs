@@ -13,5 +13,6 @@ public sealed class PluginServiceRegistrator : IPluginServiceRegistrator
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
         serviceCollection.AddSingleton<BulletinStore>();
+        serviceCollection.AddSingleton<BulletinImageStore>();
     }
 }

@@ -12,6 +12,12 @@ public sealed partial class BulletinStore
     private const int MaxItems = 250;
     private const int MaxTitleLength = 160;
     private const int MaxTextLength = 10000;
+    private readonly BulletinImageStore _images;
+
+    public BulletinStore(BulletinImageStore images)
+    {
+        _images = images;
+    }
 
     public BulletinResponse GetPublished()
     {
@@ -59,6 +65,7 @@ public sealed partial class BulletinStore
         configuration.VisibleItemCount = Math.Clamp(request.VisibleItemCount, 3, 5);
         configuration.NewsJson = JsonConvert.SerializeObject(request.Items);
         Plugin.Instance.UpdateConfiguration(configuration);
+        _images.DeleteUnused(request.Items.Select(item => item.ImageUrl));
     }
 
     private static void ValidateItem(BulletinItem item)
@@ -67,6 +74,15 @@ public sealed partial class BulletinStore
         if (item.Title.Length is 0 or > MaxTitleLength)
         {
             throw new ArgumentException($"Titles must contain 1-{MaxTitleLength} characters.");
+        }
+
+        item.ImageUrl = string.IsNullOrWhiteSpace(item.ImageUrl) ? null : item.ImageUrl.Trim();
+        if (item.ImageUrl is not null
+            && !IsLocalImageUrl(item.ImageUrl)
+            && (!Uri.TryCreate(item.ImageUrl, UriKind.Absolute, out var imageUri)
+                || (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps)))
+        {
+            throw new ArgumentException("Image URLs must use HTTP, HTTPS, or a JellyBulletin upload.");
         }
 
         foreach (var block in item.Blocks)
@@ -123,4 +139,19 @@ public sealed partial class BulletinStore
 
     [GeneratedRegex("^#[0-9a-fA-F]{6}$", RegexOptions.CultureInvariant)]
     private static partial Regex HexColorRegex();
+
+    private static bool IsLocalImageUrl(string url)
+    {
+        const string prefix = "/Bulletin/Image/";
+        if (!url.StartsWith(prefix, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var fileName = url[prefix.Length..];
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+        return Path.GetFileName(fileName) == fileName
+            && Guid.TryParseExact(Path.GetFileNameWithoutExtension(fileName), "N", out _)
+            && extension is ".png" or ".jpg" or ".webp";
+    }
 }

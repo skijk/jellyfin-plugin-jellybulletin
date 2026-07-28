@@ -32,14 +32,30 @@
                         </div>
 
                         <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="BulletinImageUrl">Bildadress (valfritt)</label>
+                            <label class="inputLabel inputLabelUnfocused" for="BulletinImageUrl">Bild (valfritt)</label>
                             <input id="BulletinImageUrl"
                                    is="emby-input"
                                    type="url"
                                    inputmode="url"
                                    placeholder="https://…"
                                    maxlength="2048" />
-                            <div class="fieldDescription">Bilden visas bredvid texten. Adressen måste börja med https:// eller http://.</div>
+                            <input id="BulletinImageFile"
+                                   type="file"
+                                   accept="image/png,image/jpeg,image/webp"
+                                   hidden />
+                            <div id="BulletinImageDrop" class="bulletin-image-drop" tabindex="0">
+                                <span>Klistra in en bild med <kbd>⌘V</kbd>, dra den hit eller välj en fil.</span>
+                                <button is="emby-button" type="button" class="raised" id="BulletinChooseImage">
+                                    Välj bild
+                                </button>
+                            </div>
+                            <div id="BulletinImagePreviewWrap" class="bulletin-image-preview-wrap" hidden>
+                                <img id="BulletinImagePreview" alt="Förhandsvisning" />
+                                <button is="emby-button" type="button" class="raised button-delete" id="BulletinRemoveImage">
+                                    Ta bort bild
+                                </button>
+                            </div>
+                            <div class="fieldDescription">PNG, JPEG eller WebP, högst 8 MB. Du kan också använda en https://-adress.</div>
                         </div>
 
                         <div class="bulletin-toolbar" role="toolbar" aria-label="Textformatering">
@@ -102,8 +118,12 @@
         .bulletin-toolbar label { display:flex; align-items:center; gap:.5rem; }
         .bulletin-rich-editor { min-height:15rem; padding:1rem; border:1px solid rgba(255,255,255,.22); border-radius:.5rem; background:rgba(0,0,0,.18); line-height:1.6; }
         .bulletin-rich-editor:empty::before { content:attr(data-placeholder); opacity:.5; }
+        .bulletin-image-drop { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.75rem; margin:.65rem 0; padding:1rem; border:2px dashed rgba(255,255,255,.25); border-radius:.6rem; cursor:pointer; }
+        .bulletin-image-drop:focus,.bulletin-image-drop.is-dragging { border-color:#00a4dc; outline:none; background:rgba(0,164,220,.08); }
+        .bulletin-image-preview-wrap { display:grid; grid-template-columns:minmax(0,22rem) auto; align-items:end; gap:.75rem; margin:.75rem 0; }
+        .bulletin-image-preview { display:block; width:100%; max-height:14rem; object-fit:cover; border-radius:.5rem; }
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
-        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } }
+        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-image-preview-wrap { grid-template-columns:1fr; } }
     </style>
 
     <script type="text/javascript">
@@ -114,6 +134,62 @@
 
             const value = (object, upper, lower) => object?.[upper] ?? object?.[lower];
             const current = () => items.find(item => value(item, 'Id', 'id') === selectedId);
+            const validImageUrl = url =>
+                /^https?:\/\//i.test(url || '')
+                || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
+
+            function showImagePreview(url) {
+                const wrap = page.querySelector('#BulletinImagePreviewWrap');
+                const preview = page.querySelector('#BulletinImagePreview');
+                if (!validImageUrl(url)) {
+                    preview.removeAttribute('src');
+                    wrap.hidden = true;
+                    return;
+                }
+
+                preview.src = url;
+                wrap.hidden = false;
+            }
+
+            async function uploadImage(file) {
+                if (!file || !/^image\/(png|jpeg|webp)$/i.test(file.type)) {
+                    Dashboard.alert('Välj en PNG-, JPEG- eller WebP-bild.');
+                    return;
+                }
+                if (file.size > 8 * 1024 * 1024) {
+                    Dashboard.alert('Bilden får vara högst 8 MB.');
+                    return;
+                }
+
+                Dashboard.showLoadingMsg();
+                try {
+                    const form = new FormData();
+                    form.append('file', file, file.name || 'clipboard-image');
+                    const token = typeof ApiClient.accessToken === 'function'
+                        ? ApiClient.accessToken()
+                        : ApiClient.accessToken;
+                    const response = await fetch(ApiClient.getUrl('Bulletin/Admin/Image'), {
+                        method: 'POST',
+                        headers: token ? { 'X-Emby-Token': token } : {},
+                        body: form
+                    });
+                    if (!response.ok) {
+                        const failure = await response.json().catch(() => ({}));
+                        throw new Error(value(failure, 'Error', 'error') || 'Uppladdningen misslyckades.');
+                    }
+
+                    const result = await response.json();
+                    const url = value(result, 'Url', 'url');
+                    page.querySelector('#BulletinImageUrl').value = url;
+                    showImagePreview(url);
+                    const item = current();
+                    if (item) item.ImageUrl = url;
+                } catch (error) {
+                    Dashboard.alert(error.message || 'Uppladdningen misslyckades.');
+                } finally {
+                    Dashboard.hideLoadingMsg();
+                }
+            }
 
             function inlineFromNode(node, marks = {}) {
                 if (node.nodeType === Node.TEXT_NODE) {
@@ -184,7 +260,9 @@
                 page.querySelector('#BulletinEditorPanel').hidden = !item;
                 if (!item) return;
                 page.querySelector('#BulletinTitle').value = value(item, 'Title', 'title') || '';
-                page.querySelector('#BulletinImageUrl').value = value(item, 'ImageUrl', 'imageUrl') || '';
+                const imageUrl = value(item, 'ImageUrl', 'imageUrl') || '';
+                page.querySelector('#BulletinImageUrl').value = imageUrl;
+                showImagePreview(imageUrl);
                 page.querySelector('#BulletinPublished').checked = Boolean(value(item, 'IsPublished', 'isPublished'));
                 const editor = page.querySelector('#BulletinEditor');
                 editor.replaceChildren();
@@ -236,8 +314,8 @@
                 }
                 item.Title = title;
                 const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
-                if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
-                    Dashboard.alert('Bildadressen måste börja med http:// eller https://');
+                if (imageUrl && !validImageUrl(imageUrl)) {
+                    Dashboard.alert('Använd en uppladdad bild eller en adress som börjar med http:// eller https://');
                     return false;
                 }
                 item.ImageUrl = imageUrl || null;
@@ -282,6 +360,46 @@
             });
             page.querySelector('#BulletinColor').addEventListener('input', event => {
                 document.execCommand('foreColor', false, event.target.value);
+            });
+            const imageDrop = page.querySelector('#BulletinImageDrop');
+            const imageFile = page.querySelector('#BulletinImageFile');
+            page.querySelector('#BulletinChooseImage').addEventListener('click', event => {
+                event.stopPropagation();
+                imageFile.click();
+            });
+            imageDrop.addEventListener('click', () => imageDrop.focus());
+            imageFile.addEventListener('change', () => {
+                uploadImage(imageFile.files?.[0]);
+                imageFile.value = '';
+            });
+            ['dragenter', 'dragover'].forEach(eventName => {
+                imageDrop.addEventListener(eventName, event => {
+                    event.preventDefault();
+                    imageDrop.classList.add('is-dragging');
+                });
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                imageDrop.addEventListener(eventName, event => {
+                    event.preventDefault();
+                    imageDrop.classList.remove('is-dragging');
+                });
+            });
+            imageDrop.addEventListener('drop', event => uploadImage(event.dataTransfer?.files?.[0]));
+            page.addEventListener('paste', event => {
+                const image = [...(event.clipboardData?.items || [])]
+                    .find(item => item.kind === 'file' && item.type.startsWith('image/'));
+                if (!image || page.querySelector('#BulletinEditorPanel').hidden) return;
+                event.preventDefault();
+                uploadImage(image.getAsFile());
+            });
+            page.querySelector('#BulletinImageUrl').addEventListener('input', event => {
+                showImagePreview(event.target.value.trim());
+            });
+            page.querySelector('#BulletinRemoveImage').addEventListener('click', () => {
+                page.querySelector('#BulletinImageUrl').value = '';
+                showImagePreview('');
+                const item = current();
+                if (item) item.ImageUrl = null;
             });
             page.querySelector('#BulletinLink').addEventListener('click', () => {
                 const url = window.prompt('Länkens adress (https://…)');

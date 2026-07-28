@@ -17,6 +17,11 @@
         );
     }
 
+    function validImageUrl(url) {
+        return /^https?:\/\//i.test(url || '')
+            || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
+    }
+
     function createInline(run) {
         let element = document.createElement('span');
         element.textContent = run.Text || run.text || '';
@@ -129,7 +134,7 @@
             }).format(new Date(published));
             contentHost.replaceChildren(createContent(item));
             const imageUrl = item.ImageUrl || item.imageUrl;
-            if (imageUrl && /^https?:\/\//i.test(imageUrl)) {
+            if (validImageUrl(imageUrl)) {
                 image.src = imageUrl;
                 image.alt = item.Title || item.title || '';
                 image.hidden = false;

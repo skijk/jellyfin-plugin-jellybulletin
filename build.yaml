@@ -1,7 +1,7 @@
 ---
 name: "JellyBulletin"
 guid: "6ad77d9a-e157-4ca2-82e7-a114f86a5f50"
-version: "0.2.0.0"
+version: "0.2.1.0"
 targetAbi: "10.11.11.0"
 framework: "net9.0"
 overview: "News and announcements for Jellyfin."
@@ -13,4 +13,4 @@ owner: "SKYNET"
 artifacts:
 - "Jellyfin.Plugin.JellyBulletin.dll"
 - "logo.png"
-changelog: "Keep the home widget mounted and add optional images beside bulletin text."
+changelog: "Paste, drop or select PNG, JPEG and WebP images in the bulletin editor."
