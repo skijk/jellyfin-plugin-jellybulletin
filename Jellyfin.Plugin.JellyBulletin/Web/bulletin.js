@@ -171,7 +171,7 @@
         try {
             const data = await ApiClient.ajax({
                 type: 'GET',
-                url: ApiClient.getUrl('Bulletin/News'),
+                url: ApiClient.getUrl('Bulletin/News', { refresh: Date.now() }),
                 dataType: 'json'
             });
             lastData = data;
@@ -192,6 +192,7 @@
 
     document.addEventListener('viewshow', refresh);
     window.addEventListener('hashchange', refresh);
+    window.addEventListener('jellyfin-bulletin-refresh', refresh);
     new MutationObserver(maintainWidget).observe(document.body, {
         childList: true,
         subtree: true

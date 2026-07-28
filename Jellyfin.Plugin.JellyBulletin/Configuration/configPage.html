@@ -35,7 +35,7 @@
                             <label class="inputLabel inputLabelUnfocused" for="BulletinImageUrl">Bild (valfritt)</label>
                             <input id="BulletinImageUrl"
                                    is="emby-input"
-                                   type="url"
+                                   type="text"
                                    inputmode="url"
                                    placeholder="https://…"
                                    maxlength="2048" />
@@ -137,6 +137,48 @@
             const validImageUrl = url =>
                 /^https?:\/\//i.test(url || '')
                 || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
+
+            function normalizeInline(run) {
+                return {
+                    Text: value(run, 'Text', 'text') || '',
+                    Bold: Boolean(value(run, 'Bold', 'bold')),
+                    Italic: Boolean(value(run, 'Italic', 'italic')),
+                    Underline: Boolean(value(run, 'Underline', 'underline')),
+                    Color: value(run, 'Color', 'color') || null,
+                    Href: value(run, 'Href', 'href') || null
+                };
+            }
+
+            function normalizeBlock(block) {
+                return {
+                    Type: value(block, 'Type', 'type') || 'paragraph',
+                    Content: (value(block, 'Content', 'content') || []).map(normalizeInline),
+                    Items: (value(block, 'Items', 'items') || [])
+                        .map(runs => runs.map(normalizeInline))
+                };
+            }
+
+            function normalizeItem(item) {
+                return {
+                    Id: String(value(item, 'Id', 'id') || '').replaceAll('-', '').toLowerCase(),
+                    Title: value(item, 'Title', 'title') || '',
+                    ImageUrl: value(item, 'ImageUrl', 'imageUrl') || null,
+                    Blocks: (value(item, 'Blocks', 'blocks') || []).map(normalizeBlock),
+                    PublishedAt: value(item, 'PublishedAt', 'publishedAt'),
+                    UpdatedAt: value(item, 'UpdatedAt', 'updatedAt'),
+                    IsPublished: Boolean(value(item, 'IsPublished', 'isPublished'))
+                };
+            }
+
+            function contentSignature(collection) {
+                return JSON.stringify(collection.map(item => ({
+                    Id: item.Id,
+                    Title: item.Title,
+                    ImageUrl: item.ImageUrl || null,
+                    Blocks: item.Blocks,
+                    IsPublished: item.IsPublished
+                })));
+            }
 
             function showImagePreview(url) {
                 const wrap = page.querySelector('#BulletinImagePreviewWrap');
@@ -296,6 +338,7 @@
                     state.textContent = value(item, 'IsPublished', 'isPublished') ? 'Publicerad' : 'Utkast';
                     button.append(title, state);
                     button.addEventListener('click', () => {
+                        if (selectedId !== value(item, 'Id', 'id') && !applyEditor()) return;
                         selectedId = value(item, 'Id', 'id');
                         renderList();
                         loadEditor(item);
@@ -334,7 +377,7 @@
                         url: ApiClient.getUrl('Bulletin/Admin'),
                         dataType: 'json'
                     });
-                    items = value(response, 'Items', 'items') || [];
+                    items = (value(response, 'Items', 'items') || []).map(normalizeItem);
                     page.querySelector('#BulletinVisibleCount').value =
                         String(value(response, 'VisibleItemCount', 'visibleItemCount') || 5);
                     selectedId = items.length ? value(items[0], 'Id', 'id') : null;
@@ -407,7 +450,7 @@
                 else if (url) Dashboard.alert('Länken måste börja med http:// eller https://');
             });
             page.querySelector('#BulletinNew').addEventListener('click', () => {
-                const id = crypto.randomUUID();
+                const id = crypto.randomUUID().replaceAll('-', '');
                 const item = {
                     Id: id,
                     Title: '',
@@ -436,16 +479,33 @@
                 if (!applyEditor()) return false;
                 Dashboard.showLoadingMsg();
                 try {
+                    const payload = {
+                        VisibleItemCount: Number(page.querySelector('#BulletinVisibleCount').value),
+                        Items: items
+                    };
+                    const expectedSignature = contentSignature(items);
                     await ApiClient.ajax({
                         type: 'PUT',
                         url: ApiClient.getUrl('Bulletin/Admin'),
                         contentType: 'application/json',
-                        data: JSON.stringify({
-                            VisibleItemCount: Number(page.querySelector('#BulletinVisibleCount').value),
-                            Items: items
-                        })
+                        data: JSON.stringify(payload)
                     });
+                    const verification = await ApiClient.ajax({
+                        type: 'GET',
+                        url: ApiClient.getUrl('Bulletin/Admin', { verify: Date.now() }),
+                        dataType: 'json'
+                    });
+                    const verifiedItems = (value(verification, 'Items', 'items') || []).map(normalizeItem);
+                    if (contentSignature(verifiedItems) !== expectedSignature) {
+                        throw new Error('Servern returnerade inte de sparade ändringarna.');
+                    }
+                    items = verifiedItems;
+                    renderList();
+                    loadEditor(current());
+                    window.dispatchEvent(new CustomEvent('jellyfin-bulletin-refresh'));
                     Dashboard.processPluginConfigurationUpdateResult();
+                } catch (error) {
+                    Dashboard.alert(error.message || 'Nyheten kunde inte sparas.');
                 } finally {
                     Dashboard.hideLoadingMsg();
                 }
