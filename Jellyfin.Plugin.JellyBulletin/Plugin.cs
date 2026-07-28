@@ -33,7 +33,7 @@ public sealed class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             new PluginPageInfo
             {
                 Name = Name,
-                DisplayName = "JellyBulletin",
+                DisplayName = "Bulletin",
                 EnableInMainMenu = true,
                 MenuIcon = "campaign",
                 EmbeddedResourcePath = string.Format(
