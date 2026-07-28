@@ -5,6 +5,7 @@
     let lastSignature = '';
     let lastData = null;
     let refreshTimer = null;
+    let rotationTimer = null;
 
     function findHome() {
         return document.querySelector(
@@ -117,21 +118,70 @@
         feature.append(body, image);
         root.append(feature);
 
+        const navigation = document.createElement('div');
+        navigation.className = 'bulletin-navigation';
+        const previous = document.createElement('button');
+        previous.type = 'button';
+        previous.className = 'bulletin-arrow';
+        previous.setAttribute('aria-label', 'Previous announcement');
+        previous.textContent = '‹';
+        const position = document.createElement('span');
+        position.className = 'bulletin-position';
+        position.setAttribute('aria-live', 'polite');
+        const next = document.createElement('button');
+        next.type = 'button';
+        next.className = 'bulletin-arrow';
+        next.setAttribute('aria-label', 'Next announcement');
+        next.textContent = '›';
+        navigation.append(previous, position, next);
+        root.append(navigation);
+
+        const history = document.createElement('div');
+        history.className = 'bulletin-history';
+        const historyHeading = document.createElement('div');
+        historyHeading.className = 'bulletin-history-heading';
+        const historyTitle = document.createElement('h3');
+        historyTitle.textContent = 'Previous announcements';
+        const historyOrder = document.createElement('span');
+        historyOrder.textContent = 'Newest first';
+        historyHeading.append(historyTitle, historyOrder);
+        history.append(historyHeading);
+
         const tabs = document.createElement('div');
         tabs.className = 'bulletin-tabs';
-        tabs.setAttribute('role', 'tablist');
-        root.append(tabs);
+        tabs.setAttribute('aria-label', 'Previous announcements, newest first');
+        history.append(tabs);
+        if (items.length > 1) root.append(history);
 
-        function select(index) {
-            const item = items[index];
+        let selectedIndex = 0;
+        let rotationPaused = false;
+
+        function formattedDate(value, options) {
+            return new Intl.DateTimeFormat(undefined, options).format(new Date(value));
+        }
+
+        function restartRotation() {
+            clearInterval(rotationTimer);
+            if (items.length < 2 || rotationPaused || document.hidden) return;
+            rotationTimer = setInterval(() => {
+                select((selectedIndex + 1) % items.length, selectedIndex + 1 >= items.length ? -1 : 1);
+            }, 9000);
+        }
+
+        function select(index, direction = 1, restart = false) {
+            selectedIndex = (index + items.length) % items.length;
+            const item = items[selectedIndex];
+            feature.classList.remove('slide-from-left', 'slide-from-right');
+            void feature.offsetWidth;
+            feature.classList.add(direction < 0 ? 'slide-from-left' : 'slide-from-right');
             title.textContent = item.Title || item.title;
             const published = item.PublishedAt || item.publishedAt;
             date.dateTime = published;
-            date.textContent = new Intl.DateTimeFormat(undefined, {
+            date.textContent = formattedDate(published, {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
-            }).format(new Date(published));
+            });
             contentHost.replaceChildren(createContent(item));
             const imageUrl = item.ImageUrl || item.imageUrl;
             if (validImageUrl(imageUrl)) {
@@ -145,24 +195,57 @@
                 image.hidden = true;
                 feature.classList.remove('has-image');
             }
+            position.textContent = `${selectedIndex + 1} of ${items.length}`;
             [...tabs.children].forEach((button, buttonIndex) => {
-                button.setAttribute('aria-selected', String(buttonIndex === index));
+                button.setAttribute('aria-current', String(buttonIndex + 1 === selectedIndex));
             });
+            if (restart) restartRotation();
         }
 
-        items.forEach((item, index) => {
+        items.slice(1).forEach((item, historyIndex) => {
+            const index = historyIndex + 1;
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'bulletin-tab';
-            button.setAttribute('role', 'tab');
-            button.textContent = item.Title || item.title;
-            button.addEventListener('click', () => select(index));
+            const buttonDate = document.createElement('time');
+            const published = item.PublishedAt || item.publishedAt;
+            buttonDate.dateTime = published;
+            buttonDate.textContent = formattedDate(published, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            const buttonTitle = document.createElement('span');
+            buttonTitle.textContent = item.Title || item.title;
+            button.append(buttonDate, buttonTitle);
+            button.addEventListener('click', () => select(index, index < selectedIndex ? -1 : 1, true));
             tabs.append(button);
         });
 
-        select(0);
+        previous.addEventListener('click', () => select(selectedIndex - 1, -1, true));
+        next.addEventListener('click', () => select(selectedIndex + 1, 1, true));
+        root.addEventListener('mouseenter', () => {
+            rotationPaused = true;
+            clearInterval(rotationTimer);
+        });
+        root.addEventListener('mouseleave', () => {
+            rotationPaused = false;
+            restartRotation();
+        });
+        root.addEventListener('focusin', () => {
+            rotationPaused = true;
+            clearInterval(rotationTimer);
+        });
+        root.addEventListener('focusout', event => {
+            if (root.contains(event.relatedTarget)) return;
+            rotationPaused = false;
+            restartRotation();
+        });
+
+        select(0, 1);
         document.getElementById(ROOT_ID)?.remove();
         home.prepend(root);
+        restartRotation();
     }
 
     async function refresh() {

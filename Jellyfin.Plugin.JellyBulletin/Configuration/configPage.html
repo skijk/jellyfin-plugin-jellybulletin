@@ -79,6 +79,24 @@
                              onkeypress="event.stopImmediatePropagation()"
                              data-placeholder="Write the bulletin here…"></div>
 
+                        <section class="bulletin-live-preview" aria-labelledby="BulletinPreviewHeading">
+                            <div class="bulletin-preview-label">
+                                <h2 id="BulletinPreviewHeading">Home screen preview</h2>
+                                <span>Updates as you type</span>
+                            </div>
+                            <div id="BulletinPreviewFeature" class="bulletin-preview-feature">
+                                <article class="bulletin-preview-copy">
+                                    <h3 id="BulletinPreviewTitle">Untitled bulletin</h3>
+                                    <time id="BulletinPreviewDate"></time>
+                                    <div id="BulletinPreviewBody" class="bulletin-preview-body"></div>
+                                </article>
+                                <img id="BulletinHomeImagePreview" class="bulletin-home-image-preview" alt="" hidden />
+                            </div>
+                            <div class="bulletin-preview-navigation" aria-hidden="true">
+                                <span>‹</span><small>1 of 3</small><span>›</span>
+                            </div>
+                        </section>
+
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label class="emby-checkbox-label">
                                 <input id="BulletinPublished" type="checkbox" is="emby-checkbox" />
@@ -122,8 +140,27 @@
         .bulletin-image-drop:focus,.bulletin-image-drop.is-dragging { border-color:#00a4dc; outline:none; background:rgba(0,164,220,.08); }
         .bulletin-image-preview-wrap { display:grid; grid-template-columns:minmax(0,22rem) auto; align-items:end; gap:.75rem; margin:.75rem 0; }
         .bulletin-image-preview { display:block; width:100%; max-height:14rem; object-fit:cover; border-radius:.5rem; }
+        .bulletin-live-preview { --bulletin-accent:var(--jf-palette-primary-main,#00a4dc); margin:1.5rem 0; overflow:hidden; border:1px solid rgba(255,255,255,.14); border-radius:1rem; background:radial-gradient(circle at 100% 0,rgba(0,164,220,.18),transparent 42%),rgba(24,24,24,.92); box-shadow:0 .75rem 2rem rgba(0,0,0,.18); }
+        .bulletin-preview-label { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; padding:.85rem 1.2rem; border-bottom:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.22); }
+        .bulletin-preview-label h2 { margin:0; font-size:1rem; }
+        .bulletin-preview-label span { opacity:.58; font-size:.8rem; }
+        .bulletin-preview-feature { display:grid; grid-template-columns:minmax(0,1fr); height:24rem; overflow:hidden; }
+        .bulletin-preview-feature.has-image { grid-template-columns:minmax(0,1.25fr) minmax(15rem,.75fr); }
+        .bulletin-preview-copy { min-width:0; overflow-y:auto; padding:clamp(1.2rem,3vw,2.25rem); scrollbar-width:thin; }
+        .bulletin-preview-copy h3 { margin:0 0 .3rem; font-size:clamp(1.45rem,3vw,2.2rem); line-height:1.15; }
+        .bulletin-preview-copy time { display:block; margin-bottom:1.15rem; opacity:.62; font-size:.9rem; }
+        .bulletin-preview-body { font-size:1.05rem; line-height:1.65; }
+        .bulletin-preview-body p { margin:.6rem 0; }
+        .bulletin-preview-body ul,.bulletin-preview-body ol { margin:.7rem 0; padding-inline-start:1.8rem; }
+        .bulletin-preview-body a { color:var(--bulletin-accent); text-decoration:underline; text-underline-offset:.15em; }
+        .bulletin-home-image-preview { display:block; width:100%; height:100%; min-height:0; object-fit:contain; background:rgba(0,0,0,.24); border-inline-start:1px solid rgba(255,255,255,.1); }
+        .bulletin-home-image-preview[hidden] { display:none; }
+        .bulletin-preview-navigation { display:flex; align-items:center; justify-content:center; gap:.75rem; min-height:3.25rem; border-top:1px solid rgba(255,255,255,.1); }
+        .bulletin-preview-navigation span { display:grid; place-items:center; width:2.15rem; height:2.15rem; border:1px solid rgba(255,255,255,.16); border-radius:50%; background:rgba(255,255,255,.07); font-size:1.55rem; }
+        .bulletin-preview-navigation small { min-width:3.5rem; opacity:.68; text-align:center; }
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
-        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-image-preview-wrap { grid-template-columns:1fr; } }
+        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; } .bulletin-home-image-preview { order:-1; height:11rem; border-inline-start:0; border-bottom:1px solid rgba(255,255,255,.1); } }
+        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-image-preview-wrap { grid-template-columns:1fr; } .bulletin-preview-feature { height:32rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } }
     </style>
 
     <script type="text/javascript">
@@ -196,6 +233,45 @@
                 wrap.hidden = false;
             }
 
+            function updateHomePreview() {
+                const item = current();
+                const title = page.querySelector('#BulletinTitle').value.trim();
+                page.querySelector('#BulletinPreviewTitle').textContent = title || 'Untitled bulletin';
+                const published = value(item, 'PublishedAt', 'publishedAt') || new Date().toISOString();
+                const previewDate = page.querySelector('#BulletinPreviewDate');
+                previewDate.dateTime = published;
+                previewDate.textContent = new Intl.DateTimeFormat(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }).format(new Date(published));
+
+                const editor = page.querySelector('#BulletinEditor');
+                const previewBody = page.querySelector('#BulletinPreviewBody');
+                previewBody.replaceChildren(...[...editor.childNodes].map(node => node.cloneNode(true)));
+                if (!previewBody.textContent.trim()) {
+                    const placeholder = document.createElement('p');
+                    placeholder.className = 'bulletin-preview-placeholder';
+                    placeholder.textContent = 'Your announcement will appear here.';
+                    previewBody.append(placeholder);
+                }
+
+                const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
+                const previewFeature = page.querySelector('#BulletinPreviewFeature');
+                const previewImage = page.querySelector('#BulletinHomeImagePreview');
+                if (validImageUrl(imageUrl)) {
+                    previewImage.src = imageUrl;
+                    previewImage.alt = title || 'Bulletin image';
+                    previewImage.hidden = false;
+                    previewFeature.classList.add('has-image');
+                } else {
+                    previewImage.removeAttribute('src');
+                    previewImage.alt = '';
+                    previewImage.hidden = true;
+                    previewFeature.classList.remove('has-image');
+                }
+            }
+
             async function uploadImage(file) {
                 if (!file || !/^image\/(png|jpeg|webp)$/i.test(file.type)) {
                     Dashboard.alert('Choose a PNG, JPEG, or WebP image.');
@@ -229,6 +305,7 @@
                     showImagePreview(url);
                     const item = current();
                     if (item) item.ImageUrl = url;
+                    updateHomePreview();
                 } catch (error) {
                     Dashboard.alert(error.message || 'The upload failed.');
                 } finally {
@@ -325,6 +402,7 @@
                     }
                     editor.append(element);
                 });
+                updateHomePreview();
             }
 
             function renderList() {
@@ -395,6 +473,7 @@
                 button.addEventListener('click', () => {
                     document.execCommand(button.dataset.command, false, null);
                     page.querySelector('#BulletinEditor').focus();
+                    updateHomePreview();
                 });
             });
             ['keydown', 'keyup', 'keypress'].forEach(eventName => {
@@ -406,7 +485,10 @@
             });
             page.querySelector('#BulletinColor').addEventListener('input', event => {
                 document.execCommand('foreColor', false, event.target.value);
+                updateHomePreview();
             });
+            page.querySelector('#BulletinTitle').addEventListener('input', updateHomePreview);
+            page.querySelector('#BulletinEditor').addEventListener('input', updateHomePreview);
             const imageDrop = page.querySelector('#BulletinImageDrop');
             const imageFile = page.querySelector('#BulletinImageFile');
             page.querySelector('#BulletinChooseImage').addEventListener('click', event => {
@@ -440,17 +522,20 @@
             });
             page.querySelector('#BulletinImageUrl').addEventListener('input', event => {
                 showImagePreview(event.target.value.trim());
+                updateHomePreview();
             });
             page.querySelector('#BulletinRemoveImage').addEventListener('click', () => {
                 page.querySelector('#BulletinImageUrl').value = '';
                 showImagePreview('');
                 const item = current();
                 if (item) item.ImageUrl = null;
+                updateHomePreview();
             });
             page.querySelector('#BulletinLink').addEventListener('click', () => {
                 const url = window.prompt('Link URL (https://…)');
                 if (url && /^https?:\/\//i.test(url)) document.execCommand('createLink', false, url);
                 else if (url) Dashboard.alert('The link must start with http:// or https://.');
+                updateHomePreview();
             });
             page.querySelector('#BulletinNew').addEventListener('click', () => {
                 const id = crypto.randomUUID().replaceAll('-', '');
