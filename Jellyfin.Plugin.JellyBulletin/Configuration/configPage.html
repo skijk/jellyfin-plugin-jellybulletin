@@ -1,0 +1,310 @@
+<div id="BulletinConfigPage"
+     data-role="page"
+     class="page type-interior pluginConfigurationPage"
+     data-require="emby-button,emby-input,emby-select,emby-checkbox">
+    <div data-role="content">
+        <div class="content-primary">
+            <form id="BulletinForm">
+                <h1>JellyBulletin</h1>
+                <p>Publicera nyheter och driftmeddelanden till alla användare.</p>
+
+                <div class="selectContainer">
+                    <label class="selectLabel" for="BulletinVisibleCount">Antal nyheter på startsidan</label>
+                    <select id="BulletinVisibleCount" is="emby-select" class="emby-select-withcolor emby-select">
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="bulletin-admin-layout">
+                    <aside>
+                        <button is="emby-button" type="button" class="raised button-submit block" id="BulletinNew">
+                            Ny nyhet
+                        </button>
+                        <div id="BulletinItems"></div>
+                    </aside>
+
+                    <main id="BulletinEditorPanel" hidden>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="BulletinTitle">Rubrik</label>
+                            <input id="BulletinTitle" is="emby-input" maxlength="160" required />
+                        </div>
+
+                        <div class="bulletin-toolbar" role="toolbar" aria-label="Textformatering">
+                            <button type="button" data-command="bold"><strong>B</strong></button>
+                            <button type="button" data-command="italic"><em>I</em></button>
+                            <button type="button" data-command="underline"><u>U</u></button>
+                            <label>Färg <input type="color" id="BulletinColor" value="#ffffff" /></label>
+                            <button type="button" id="BulletinLink">Länk</button>
+                            <button type="button" data-command="insertUnorderedList">• Lista</button>
+                            <button type="button" data-command="insertOrderedList">1. Lista</button>
+                            <button type="button" data-command="removeFormat">Rensa format</button>
+                        </div>
+
+                        <div id="BulletinEditor"
+                             class="bulletin-rich-editor"
+                             contenteditable="true"
+                             role="textbox"
+                             aria-multiline="true"
+                             data-placeholder="Skriv nyheten här…"></div>
+
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="BulletinPublished" type="checkbox" is="emby-checkbox" />
+                                <span>Publicerad</span>
+                            </label>
+                            <div class="fieldDescription">Publicerade nyheter visas omedelbart för alla användare.</div>
+                        </div>
+
+                        <div class="bulletin-editor-actions">
+                            <button is="emby-button" type="button" class="raised button-submit" id="BulletinApply">
+                                Tillämpa ändringar
+                            </button>
+                            <button is="emby-button" type="button" class="raised button-delete" id="BulletinDelete">
+                                Ta bort
+                            </button>
+                        </div>
+                    </main>
+                </div>
+
+                <div>
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        Spara allt
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .bulletin-admin-layout { display:grid; grid-template-columns:minmax(13rem, 18rem) 1fr; gap:1.5rem; margin:1.5rem 0; }
+        #BulletinItems { display:grid; gap:.5rem; margin-top:.75rem; }
+        .bulletin-item-button { width:100%; padding:.8rem; border:1px solid rgba(255,255,255,.14); border-radius:.5rem; background:rgba(255,255,255,.05); color:inherit; text-align:left; cursor:pointer; }
+        .bulletin-item-button[aria-current="true"] { border-color:#00a4dc; }
+        .bulletin-item-button small { display:block; margin-top:.2rem; opacity:.65; }
+        .bulletin-toolbar { display:flex; flex-wrap:wrap; gap:.45rem; align-items:center; margin:.75rem 0; }
+        .bulletin-toolbar button,.bulletin-toolbar label { box-sizing:border-box; min-height:2.4rem; padding:.5rem .7rem; border:1px solid rgba(255,255,255,.18); border-radius:.35rem; background:rgba(255,255,255,.08); color:inherit; }
+        .bulletin-toolbar label { display:flex; align-items:center; gap:.5rem; }
+        .bulletin-rich-editor { min-height:15rem; padding:1rem; border:1px solid rgba(255,255,255,.22); border-radius:.5rem; background:rgba(0,0,0,.18); line-height:1.6; }
+        .bulletin-rich-editor:empty::before { content:attr(data-placeholder); opacity:.5; }
+        .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
+        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } }
+    </style>
+
+    <script type="text/javascript">
+        (() => {
+            const page = document.querySelector('#BulletinConfigPage');
+            let items = [];
+            let selectedId = null;
+
+            const value = (object, upper, lower) => object?.[upper] ?? object?.[lower];
+            const current = () => items.find(item => value(item, 'Id', 'id') === selectedId);
+
+            function inlineFromNode(node, marks = {}) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    return node.textContent ? [{ Text: node.textContent, ...marks }] : [];
+                }
+                if (node.nodeType !== Node.ELEMENT_NODE) return [];
+
+                const next = { ...marks };
+                const tag = node.tagName.toLowerCase();
+                if (tag === 'strong' || tag === 'b') next.Bold = true;
+                if (tag === 'em' || tag === 'i') next.Italic = true;
+                if (tag === 'u') next.Underline = true;
+                if (tag === 'a' && /^https?:\/\//i.test(node.href)) next.Href = node.href;
+
+                const color = node.style?.color;
+                if (color) {
+                    const context = document.createElement('canvas').getContext('2d');
+                    context.fillStyle = color;
+                    const normalized = context.fillStyle;
+                    if (/^#[0-9a-f]{6}$/i.test(normalized)) next.Color = normalized;
+                }
+                return [...node.childNodes].flatMap(child => inlineFromNode(child, next));
+            }
+
+            function serializeEditor() {
+                const blocks = [];
+                [...page.querySelector('#BulletinEditor').childNodes].forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                        blocks.push({ Type: 'paragraph', Content: inlineFromNode(node), Items: [] });
+                        return;
+                    }
+                    if (node.nodeType !== Node.ELEMENT_NODE) return;
+                    const tag = node.tagName.toLowerCase();
+                    if (tag === 'ul' || tag === 'ol') {
+                        blocks.push({
+                            Type: tag === 'ul' ? 'bulletList' : 'numberedList',
+                            Content: [],
+                            Items: [...node.children]
+                                .filter(child => child.tagName.toLowerCase() === 'li')
+                                .map(child => inlineFromNode(child))
+                        });
+                    } else {
+                        blocks.push({ Type: 'paragraph', Content: inlineFromNode(node), Items: [] });
+                    }
+                });
+                return blocks;
+            }
+
+            function createInline(run) {
+                let element = document.createElement('span');
+                element.textContent = value(run, 'Text', 'text') || '';
+                if (value(run, 'Bold', 'bold')) element.style.fontWeight = '700';
+                if (value(run, 'Italic', 'italic')) element.style.fontStyle = 'italic';
+                if (value(run, 'Underline', 'underline')) element.style.textDecoration = 'underline';
+                const color = value(run, 'Color', 'color');
+                if (/^#[0-9a-f]{6}$/i.test(color || '')) element.style.color = color;
+                const href = value(run, 'Href', 'href');
+                if (href && /^https?:\/\//i.test(href)) {
+                    const link = document.createElement('a');
+                    link.href = href;
+                    link.append(element);
+                    return link;
+                }
+                return element;
+            }
+
+            function loadEditor(item) {
+                page.querySelector('#BulletinEditorPanel').hidden = !item;
+                if (!item) return;
+                page.querySelector('#BulletinTitle').value = value(item, 'Title', 'title') || '';
+                page.querySelector('#BulletinPublished').checked = Boolean(value(item, 'IsPublished', 'isPublished'));
+                const editor = page.querySelector('#BulletinEditor');
+                editor.replaceChildren();
+                (value(item, 'Blocks', 'blocks') || []).forEach(block => {
+                    const type = value(block, 'Type', 'type');
+                    const element = document.createElement(type === 'bulletList' ? 'ul' : type === 'numberedList' ? 'ol' : 'p');
+                    if (type === 'paragraph') {
+                        (value(block, 'Content', 'content') || []).forEach(run => element.append(createInline(run)));
+                    } else {
+                        (value(block, 'Items', 'items') || []).forEach(runs => {
+                            const li = document.createElement('li');
+                            runs.forEach(run => li.append(createInline(run)));
+                            element.append(li);
+                        });
+                    }
+                    editor.append(element);
+                });
+            }
+
+            function renderList() {
+                const host = page.querySelector('#BulletinItems');
+                host.replaceChildren();
+                items.forEach(item => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'bulletin-item-button';
+                    button.setAttribute('aria-current', String(value(item, 'Id', 'id') === selectedId));
+                    const title = document.createElement('span');
+                    title.textContent = value(item, 'Title', 'title') || 'Namnlöst utkast';
+                    const state = document.createElement('small');
+                    state.textContent = value(item, 'IsPublished', 'isPublished') ? 'Publicerad' : 'Utkast';
+                    button.append(title, state);
+                    button.addEventListener('click', () => {
+                        selectedId = value(item, 'Id', 'id');
+                        renderList();
+                        loadEditor(item);
+                    });
+                    host.append(button);
+                });
+            }
+
+            function applyEditor() {
+                const item = current();
+                if (!item) return true;
+                const title = page.querySelector('#BulletinTitle').value.trim();
+                if (!title) {
+                    Dashboard.alert('Rubriken får inte vara tom.');
+                    return false;
+                }
+                item.Title = title;
+                item.Blocks = serializeEditor();
+                item.IsPublished = page.querySelector('#BulletinPublished').checked;
+                item.PublishedAt ||= new Date().toISOString();
+                renderList();
+                return true;
+            }
+
+            async function load() {
+                Dashboard.showLoadingMsg();
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'GET',
+                        url: ApiClient.getUrl('Bulletin/Admin'),
+                        dataType: 'json'
+                    });
+                    items = value(response, 'Items', 'items') || [];
+                    page.querySelector('#BulletinVisibleCount').value =
+                        String(value(response, 'VisibleItemCount', 'visibleItemCount') || 5);
+                    selectedId = items.length ? value(items[0], 'Id', 'id') : null;
+                    renderList();
+                    loadEditor(current());
+                } finally {
+                    Dashboard.hideLoadingMsg();
+                }
+            }
+
+            page.querySelectorAll('[data-command]').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.execCommand(button.dataset.command, false, null);
+                    page.querySelector('#BulletinEditor').focus();
+                });
+            });
+            page.querySelector('#BulletinColor').addEventListener('input', event => {
+                document.execCommand('foreColor', false, event.target.value);
+            });
+            page.querySelector('#BulletinLink').addEventListener('click', () => {
+                const url = window.prompt('Länkens adress (https://…)');
+                if (url && /^https?:\/\//i.test(url)) document.execCommand('createLink', false, url);
+                else if (url) Dashboard.alert('Länken måste börja med http:// eller https://');
+            });
+            page.querySelector('#BulletinNew').addEventListener('click', () => {
+                const id = crypto.randomUUID();
+                const item = {
+                    Id: id,
+                    Title: '',
+                    Blocks: [{ Type: 'paragraph', Content: [], Items: [] }],
+                    PublishedAt: new Date().toISOString(),
+                    UpdatedAt: new Date().toISOString(),
+                    IsPublished: false
+                };
+                items.unshift(item);
+                selectedId = id;
+                renderList();
+                loadEditor(item);
+                page.querySelector('#BulletinTitle').focus();
+            });
+            page.querySelector('#BulletinApply').addEventListener('click', applyEditor);
+            page.querySelector('#BulletinDelete').addEventListener('click', () => {
+                if (!current() || !window.confirm('Ta bort den här nyheten?')) return;
+                items = items.filter(item => value(item, 'Id', 'id') !== selectedId);
+                selectedId = items.length ? value(items[0], 'Id', 'id') : null;
+                renderList();
+                loadEditor(current());
+            });
+            page.querySelector('#BulletinForm').addEventListener('submit', async event => {
+                event.preventDefault();
+                if (!applyEditor()) return false;
+                Dashboard.showLoadingMsg();
+                try {
+                    await ApiClient.ajax({
+                        type: 'PUT',
+                        url: ApiClient.getUrl('Bulletin/Admin'),
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            VisibleItemCount: Number(page.querySelector('#BulletinVisibleCount').value),
+                            Items: items
+                        })
+                    });
+                    Dashboard.processPluginConfigurationUpdateResult();
+                } finally {
+                    Dashboard.hideLoadingMsg();
+                }
+                return false;
+            });
+            page.addEventListener('pageshow', load);
+        })();
+    </script>
+</div>
