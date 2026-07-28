@@ -1,7 +1,7 @@
 ---
 name: "JellyBulletin"
 guid: "6ad77d9a-e157-4ca2-82e7-a114f86a5f50"
-version: "0.1.0.0"
+version: "0.1.1.0"
 targetAbi: "10.11.11.0"
 framework: "net9.0"
 overview: "News and announcements for Jellyfin."
@@ -12,4 +12,4 @@ category: "General"
 owner: "SKYNET"
 artifacts:
 - "Jellyfin.Plugin.JellyBulletin.dll"
-changelog: "Initial development release."
+changelog: "Fix Jellyfin Web startup failure with File Transformation 2.5.11."

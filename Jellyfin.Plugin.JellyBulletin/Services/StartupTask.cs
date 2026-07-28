@@ -1,9 +1,7 @@
 using System.Reflection;
 using System.Runtime.Loader;
-using Jellyfin.Plugin.JellyBulletin.Models;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 
 namespace Jellyfin.Plugin.JellyBulletin.Services;
 
@@ -12,6 +10,9 @@ namespace Jellyfin.Plugin.JellyBulletin.Services;
 /// </summary>
 public sealed class StartupTask : IScheduledTask
 {
+    private static readonly Guid TransformationId =
+        Guid.Parse("33e44c90-c85a-4fe0-a65f-07a57cd8456c");
+
     private readonly ILogger<StartupTask> _logger;
 
     public StartupTask(ILogger<StartupTask> logger)
@@ -34,27 +35,42 @@ public sealed class StartupTask : IScheduledTask
             .FirstOrDefault(assembly =>
                 assembly.FullName?.Contains(".FileTransformation", StringComparison.Ordinal) == true);
 
-        var pluginInterface = transformationAssembly?
-            .GetType("Jellyfin.Plugin.FileTransformation.PluginInterface");
-        var registerMethod = pluginInterface?.GetMethod("RegisterTransformation");
+        var pluginType = transformationAssembly?
+            .GetType("Jellyfin.Plugin.FileTransformation.FileTransformationPlugin");
+        var writeServiceType = transformationAssembly?
+            .GetType("Jellyfin.Plugin.FileTransformation.Library.IWebFileTransformationWriteService");
+        var transformDelegateType = transformationAssembly?
+            .GetType("Jellyfin.Plugin.FileTransformation.Library.TransformFile");
+        var serviceProvider = pluginType?
+            .GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)?
+            .GetValue(null)?
+            .GetType()
+            .GetProperty("ServiceProvider", BindingFlags.Public | BindingFlags.Instance)?
+            .GetValue(pluginType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)?.GetValue(null))
+            as IServiceProvider;
 
-        if (registerMethod is null)
+        if (writeServiceType is null || transformDelegateType is null || serviceProvider is null)
         {
             _logger.LogWarning(
                 "File Transformation was not found. Bulletin cannot be injected into Jellyfin Web.");
             return Task.CompletedTask;
         }
 
-        var payload = new JObject
-        {
-            ["id"] = "33e44c90-c85a-4fe0-a65f-07a57cd8456c",
-            ["fileNamePattern"] = "index.html",
-            ["callbackAssembly"] = GetType().Assembly.FullName,
-            ["callbackClass"] = typeof(WebInjection).FullName,
-            ["callbackMethod"] = nameof(WebInjection.PatchIndex)
-        };
+        var writeService = serviceProvider.GetService(writeServiceType);
+        var updateMethod = writeServiceType.GetMethod("UpdateTransformation");
+        var transformMethod = typeof(WebInjection).GetMethod(
+            nameof(WebInjection.TransformIndex),
+            BindingFlags.Public | BindingFlags.Static);
 
-        registerMethod.Invoke(null, [payload]);
+        if (writeService is null || updateMethod is null || transformMethod is null)
+        {
+            _logger.LogWarning(
+                "File Transformation does not expose the required transformation API.");
+            return Task.CompletedTask;
+        }
+
+        var callback = Delegate.CreateDelegate(transformDelegateType, transformMethod);
+        updateMethod.Invoke(writeService, [TransformationId, "index.html", callback]);
         _logger.LogInformation("Bulletin registered its Jellyfin Web transformation.");
         progress.Report(100);
         return Task.CompletedTask;
