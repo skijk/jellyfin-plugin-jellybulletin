@@ -47,6 +47,9 @@
                              contenteditable="true"
                              role="textbox"
                              aria-multiline="true"
+                             onkeydown="event.stopImmediatePropagation()"
+                             onkeyup="event.stopImmediatePropagation()"
+                             onkeypress="event.stopImmediatePropagation()"
                              data-placeholder="Skriv nyheten här…"></div>
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
@@ -252,11 +255,12 @@
                     page.querySelector('#BulletinEditor').focus();
                 });
             });
-            ['#BulletinTitle', '#BulletinEditor'].forEach(selector => {
-                const field = page.querySelector(selector);
-                ['keydown', 'keyup', 'keypress'].forEach(eventName => {
-                    field.addEventListener(eventName, event => event.stopPropagation());
-                });
+            ['keydown', 'keyup', 'keypress'].forEach(eventName => {
+                page.addEventListener(eventName, event => {
+                    if (event.target.closest?.('#BulletinTitle, #BulletinEditor')) {
+                        event.stopImmediatePropagation();
+                    }
+                }, true);
             });
             page.querySelector('#BulletinColor').addEventListener('input', event => {
                 document.execCommand('foreColor', false, event.target.value);
