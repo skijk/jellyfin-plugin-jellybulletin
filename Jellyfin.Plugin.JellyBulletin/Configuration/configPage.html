@@ -252,6 +252,12 @@
                     page.querySelector('#BulletinEditor').focus();
                 });
             });
+            ['#BulletinTitle', '#BulletinEditor'].forEach(selector => {
+                const field = page.querySelector(selector);
+                ['keydown', 'keyup', 'keypress'].forEach(eventName => {
+                    field.addEventListener(eventName, event => event.stopPropagation());
+                });
+            });
             page.querySelector('#BulletinColor').addEventListener('input', event => {
                 document.execCommand('foreColor', false, event.target.value);
             });
