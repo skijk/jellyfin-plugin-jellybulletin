@@ -6,6 +6,8 @@
 
 <p align="center"><strong>News and announcements on the Jellyfin home screen.</strong></p>
 
+![JellyBulletin presenting a digital announcement](docs/images/jellybulletin-hero.png)
+
 > Public beta. JellyBulletin is tested against Jellyfin 10.11.11 and currently
 > targets Jellyfin Web and web-based clients.
 
@@ -103,6 +105,12 @@ The project targets .NET 9 and builds against Jellyfin 10.11.11.
 JellyBulletin was developed with extensive assistance from OpenAI Codex. The
 project owner directed the product design, requirements and testing; Codex
 assisted with implementation, review, release packaging and documentation.
+
+## Media assets
+
+The generated [wide hero](docs/images/jellybulletin-hero.png) and
+[square social image](docs/images/jellybulletin-social.png) may be used when
+sharing or discussing JellyBulletin.
 
 ## License
 
