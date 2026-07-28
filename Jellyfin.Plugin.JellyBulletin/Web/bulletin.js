@@ -136,23 +136,6 @@
         navigation.append(previous, position, next);
         root.append(navigation);
 
-        const history = document.createElement('div');
-        history.className = 'bulletin-history';
-        const historyHeading = document.createElement('div');
-        historyHeading.className = 'bulletin-history-heading';
-        const historyTitle = document.createElement('h3');
-        historyTitle.textContent = 'Previous announcements';
-        const historyOrder = document.createElement('span');
-        historyOrder.textContent = 'Newest first';
-        historyHeading.append(historyTitle, historyOrder);
-        history.append(historyHeading);
-
-        const tabs = document.createElement('div');
-        tabs.className = 'bulletin-tabs';
-        tabs.setAttribute('aria-label', 'Previous announcements, newest first');
-        history.append(tabs);
-        if (items.length > 1) root.append(history);
-
         let selectedIndex = 0;
         let rotationPaused = false;
 
@@ -196,31 +179,8 @@
                 feature.classList.remove('has-image');
             }
             position.textContent = `${selectedIndex + 1} of ${items.length}`;
-            [...tabs.children].forEach((button, buttonIndex) => {
-                button.setAttribute('aria-current', String(buttonIndex + 1 === selectedIndex));
-            });
             if (restart) restartRotation();
         }
-
-        items.slice(1).forEach((item, historyIndex) => {
-            const index = historyIndex + 1;
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'bulletin-tab';
-            const buttonDate = document.createElement('time');
-            const published = item.PublishedAt || item.publishedAt;
-            buttonDate.dateTime = published;
-            buttonDate.textContent = formattedDate(published, {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-            const buttonTitle = document.createElement('span');
-            buttonTitle.textContent = item.Title || item.title;
-            button.append(buttonDate, buttonTitle);
-            button.addEventListener('click', () => select(index, index < selectedIndex ? -1 : 1, true));
-            tabs.append(button);
-        });
 
         previous.addEventListener('click', () => select(selectedIndex - 1, -1, true));
         next.addEventListener('click', () => select(selectedIndex + 1, 1, true));

@@ -17,7 +17,7 @@
 .bulletin-feature {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    height: clamp(22rem, 38vw, 30rem);
+    height: clamp(17rem, 25vw, 22rem);
     overflow: hidden;
 }
 
@@ -108,7 +108,7 @@
     align-items: center;
     justify-content: center;
     gap: .75rem;
-    min-height: 3.25rem;
+    min-height: 2.8rem;
     border-top: 1px solid rgba(255, 255, 255, .1);
 }
 
@@ -138,66 +138,6 @@
     text-align: center;
 }
 
-.bulletin-history {
-    padding: 1.05rem clamp(1.2rem, 3vw, 2.25rem) 1.2rem;
-    border-top: 1px solid rgba(255, 255, 255, .1);
-    background: rgba(0, 0, 0, .14);
-}
-
-.bulletin-history-heading {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: .75rem;
-}
-
-.bulletin-history-heading h3 {
-    margin: 0;
-    font-size: 1.05rem;
-}
-
-.bulletin-history-heading span {
-    color: rgba(255, 255, 255, .55);
-    font-size: .8rem;
-}
-
-.bulletin-tabs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-    gap: .6rem;
-}
-
-.bulletin-tab {
-    display: grid;
-    min-width: 0;
-    overflow: hidden;
-    padding: .65rem .8rem;
-    border: 1px solid rgba(255, 255, 255, .14);
-    border-radius: .6rem;
-    background: rgba(255, 255, 255, .06);
-    color: inherit;
-    text-align: start;
-    cursor: pointer;
-}
-
-.bulletin-tab time {
-    margin-bottom: .2rem;
-    color: rgba(255, 255, 255, .55);
-    font-size: .75rem;
-}
-
-.bulletin-tab span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.bulletin-tab[aria-current="true"] {
-    border-color: var(--bulletin-accent);
-    background: rgba(0, 164, 220, .18);
-}
-
 @media (max-width: 600px) {
     .jellyfin-bulletin {
         margin-inline: 1rem;
@@ -209,13 +149,7 @@
     }
 
     .bulletin-feature {
-        height: 34rem;
-    }
-
-    .bulletin-history-heading {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: .15rem;
+        height: 27rem;
     }
 }
 
@@ -226,7 +160,7 @@
 
     .bulletin-image {
         order: -1;
-        height: 14rem;
+        height: 10rem;
         border-inline-start: 0;
         border-bottom: 1px solid rgba(255, 255, 255, .1);
     }
