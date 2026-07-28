@@ -88,7 +88,10 @@
         const home = findHome();
         if (!home) return;
 
-        const signature = JSON.stringify(items);
+        const autoRotate = Boolean(data.AutoRotate ?? data.autoRotate ?? true);
+        const rotationSeconds = Math.max(5, Math.min(30,
+            Number(data.RotationIntervalSeconds ?? data.rotationIntervalSeconds ?? 9)));
+        const signature = JSON.stringify({ items, autoRotate, rotationSeconds });
         const existing = document.getElementById(ROOT_ID);
         if (signature === lastSignature && existing) {
             if (existing.parentElement !== home) home.prepend(existing);
@@ -128,16 +131,29 @@
         const position = document.createElement('span');
         position.className = 'bulletin-position';
         position.setAttribute('aria-live', 'polite');
+        const pause = document.createElement('button');
+        pause.type = 'button';
+        pause.className = 'bulletin-arrow bulletin-pause';
         const next = document.createElement('button');
         next.type = 'button';
         next.className = 'bulletin-arrow';
         next.setAttribute('aria-label', 'Next announcement');
         next.textContent = '›';
-        navigation.append(previous, position, next);
+        navigation.append(previous, position, pause, next);
         root.append(navigation);
 
         let selectedIndex = 0;
-        let rotationPaused = false;
+        let interactionPaused = false;
+        let manuallyPaused = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function updatePauseButton() {
+            pause.textContent = manuallyPaused ? '▶' : 'Ⅱ';
+            pause.setAttribute('aria-label', manuallyPaused
+                ? 'Start automatic announcement rotation'
+                : 'Pause automatic announcement rotation');
+            pause.setAttribute('aria-pressed', String(manuallyPaused));
+            pause.hidden = !autoRotate || items.length < 2;
+        }
 
         function formattedDate(value, options) {
             return new Intl.DateTimeFormat(undefined, options).format(new Date(value));
@@ -145,10 +161,10 @@
 
         function restartRotation() {
             clearInterval(rotationTimer);
-            if (items.length < 2 || rotationPaused || document.hidden) return;
+            if (!autoRotate || items.length < 2 || interactionPaused || manuallyPaused || document.hidden) return;
             rotationTimer = setInterval(() => {
                 select((selectedIndex + 1) % items.length, selectedIndex + 1 >= items.length ? -1 : 1);
-            }, 9000);
+            }, rotationSeconds * 1000);
         }
 
         function select(index, direction = 1, restart = false) {
@@ -158,7 +174,7 @@
             void feature.offsetWidth;
             feature.classList.add(direction < 0 ? 'slide-from-left' : 'slide-from-right');
             title.textContent = item.Title || item.title;
-            const published = item.PublishedAt || item.publishedAt;
+            const published = item.PublishAt || item.publishAt || item.PublishedAt || item.publishedAt;
             date.dateTime = published;
             date.textContent = formattedDate(published, {
                 year: 'numeric',
@@ -169,7 +185,7 @@
             const imageUrl = item.ImageUrl || item.imageUrl;
             if (validImageUrl(imageUrl)) {
                 image.src = imageUrl;
-                image.alt = item.Title || item.title || '';
+                image.alt = item.ImageAlt || item.imageAlt || '';
                 image.hidden = false;
                 feature.classList.add('has-image');
             } else {
@@ -184,24 +200,30 @@
 
         previous.addEventListener('click', () => select(selectedIndex - 1, -1, true));
         next.addEventListener('click', () => select(selectedIndex + 1, 1, true));
+        pause.addEventListener('click', () => {
+            manuallyPaused = !manuallyPaused;
+            updatePauseButton();
+            restartRotation();
+        });
         root.addEventListener('mouseenter', () => {
-            rotationPaused = true;
+            interactionPaused = true;
             clearInterval(rotationTimer);
         });
         root.addEventListener('mouseleave', () => {
-            rotationPaused = false;
+            interactionPaused = false;
             restartRotation();
         });
         root.addEventListener('focusin', () => {
-            rotationPaused = true;
+            interactionPaused = true;
             clearInterval(rotationTimer);
         });
         root.addEventListener('focusout', event => {
             if (root.contains(event.relatedTarget)) return;
-            rotationPaused = false;
+            interactionPaused = false;
             restartRotation();
         });
 
+        updatePauseButton();
         select(0, 1);
         document.getElementById(ROOT_ID)?.remove();
         home.prepend(root);

@@ -11,6 +11,7 @@ public sealed partial class BulletinStore
 {
     private const int MaxItems = 250;
     private const int MaxTitleLength = 160;
+    private const int MaxAltTextLength = 300;
     private const int MaxTextLength = 10000;
     private readonly BulletinImageStore _images;
 
@@ -22,15 +23,22 @@ public sealed partial class BulletinStore
     public BulletinResponse GetPublished()
     {
         var configuration = Plugin.Instance.Configuration;
+        var now = DateTimeOffset.UtcNow;
         var items = ReadItems()
-            .Where(item => item.IsPublished)
-            .OrderByDescending(item => item.PublishedAt)
+            .Where(item => item.IsPublished
+                && (!item.PublishAt.HasValue || item.PublishAt.Value <= now)
+                && (!item.UnpublishAt.HasValue || item.UnpublishAt.Value > now))
+            .OrderByDescending(item => item.IsPinned)
+            .ThenBy(item => item.SortOrder)
+            .ThenByDescending(item => item.PublishedAt)
             .Take(Math.Clamp(configuration.VisibleItemCount, 3, 5))
             .ToList();
 
         return new BulletinResponse
         {
             VisibleItemCount = Math.Clamp(configuration.VisibleItemCount, 3, 5),
+            AutoRotate = configuration.AutoRotate,
+            RotationIntervalSeconds = Math.Clamp(configuration.RotationIntervalSeconds, 5, 30),
             Items = items
         };
     }
@@ -40,7 +48,13 @@ public sealed partial class BulletinStore
         return new SaveBulletinsRequest
         {
             VisibleItemCount = Math.Clamp(Plugin.Instance.Configuration.VisibleItemCount, 3, 5),
-            Items = ReadItems().OrderByDescending(item => item.PublishedAt).ToList()
+            AutoRotate = Plugin.Instance.Configuration.AutoRotate,
+            RotationIntervalSeconds = Math.Clamp(Plugin.Instance.Configuration.RotationIntervalSeconds, 5, 30),
+            Items = ReadItems()
+                .OrderByDescending(item => item.IsPinned)
+                .ThenBy(item => item.SortOrder)
+                .ThenByDescending(item => item.PublishedAt)
+                .ToList()
         };
     }
 
@@ -53,16 +67,20 @@ public sealed partial class BulletinStore
         }
 
         var now = DateTimeOffset.UtcNow;
-        foreach (var item in request.Items)
+        for (var index = 0; index < request.Items.Count; index++)
         {
+            var item = request.Items[index];
             ValidateItem(item);
             item.Id = item.Id == Guid.Empty ? Guid.NewGuid() : item.Id;
             item.UpdatedAt = now;
             item.PublishedAt = item.PublishedAt == default ? now : item.PublishedAt;
+            item.SortOrder = index;
         }
 
         var configuration = Plugin.Instance.Configuration;
         configuration.VisibleItemCount = Math.Clamp(request.VisibleItemCount, 3, 5);
+        configuration.AutoRotate = request.AutoRotate;
+        configuration.RotationIntervalSeconds = Math.Clamp(request.RotationIntervalSeconds, 5, 30);
         configuration.NewsJson = JsonConvert.SerializeObject(request.Items);
         Plugin.Instance.UpdateConfiguration(configuration);
         _images.DeleteUnused(request.Items.Select(item => item.ImageUrl));
@@ -83,6 +101,19 @@ public sealed partial class BulletinStore
                 || (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps)))
         {
             throw new ArgumentException("Image URLs must use HTTP, HTTPS, or a JellyBulletin upload.");
+        }
+
+        item.ImageAlt = string.IsNullOrWhiteSpace(item.ImageAlt) ? null : item.ImageAlt.Trim();
+        if (item.ImageAlt?.Length > MaxAltTextLength)
+        {
+            throw new ArgumentException($"Image alternative text must not exceed {MaxAltTextLength} characters.");
+        }
+
+        if (item.PublishAt.HasValue
+            && item.UnpublishAt.HasValue
+            && item.UnpublishAt.Value <= item.PublishAt.Value)
+        {
+            throw new ArgumentException("The unpublish time must be later than the publish time.");
         }
 
         foreach (var block in item.Blocks)

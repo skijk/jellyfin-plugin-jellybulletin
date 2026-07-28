@@ -11,13 +11,23 @@ public sealed class BulletinItem
 
     public string? ImageUrl { get; set; }
 
+    public string? ImageAlt { get; set; }
+
     public List<BulletinBlock> Blocks { get; set; } = [];
 
     public DateTimeOffset PublishedAt { get; set; }
 
     public DateTimeOffset UpdatedAt { get; set; }
 
+    public DateTimeOffset? PublishAt { get; set; }
+
+    public DateTimeOffset? UnpublishAt { get; set; }
+
     public bool IsPublished { get; set; }
+
+    public bool IsPinned { get; set; }
+
+    public int SortOrder { get; set; }
 }
 
 /// <summary>
@@ -57,6 +67,10 @@ public sealed class SaveBulletinsRequest
 {
     public int VisibleItemCount { get; set; } = 5;
 
+    public bool AutoRotate { get; set; } = true;
+
+    public int RotationIntervalSeconds { get; set; } = 9;
+
     public List<BulletinItem> Items { get; set; } = [];
 }
 
@@ -66,6 +80,10 @@ public sealed class SaveBulletinsRequest
 public sealed class BulletinResponse
 {
     public int VisibleItemCount { get; set; }
+
+    public bool AutoRotate { get; set; }
+
+    public int RotationIntervalSeconds { get; set; }
 
     public List<BulletinItem> Items { get; set; } = [];
 }

@@ -17,6 +17,27 @@
                     </select>
                 </div>
 
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label class="emby-checkbox-label">
+                        <input id="BulletinAutoRotate" type="checkbox" is="emby-checkbox" />
+                        <span>Rotate announcements automatically</span>
+                    </label>
+                    <div class="fieldDescription">Users can pause rotation from the home screen.</div>
+                </div>
+
+                <div class="selectContainer" id="BulletinRotationIntervalWrap">
+                    <label class="selectLabel" for="BulletinRotationInterval">Rotation interval</label>
+                    <select id="BulletinRotationInterval" is="emby-select" class="emby-select-withcolor emby-select">
+                        <option value="5">5 seconds</option>
+                        <option value="7">7 seconds</option>
+                        <option value="9">9 seconds</option>
+                        <option value="12">12 seconds</option>
+                        <option value="15">15 seconds</option>
+                        <option value="20">20 seconds</option>
+                        <option value="30">30 seconds</option>
+                    </select>
+                </div>
+
                 <div class="bulletin-admin-layout">
                     <aside>
                         <button is="emby-button" type="button" class="raised button-submit block" id="BulletinNew">
@@ -58,6 +79,15 @@
                             <div class="fieldDescription">PNG, JPEG or WebP, up to 8 MB. You can also use an HTTP or HTTPS URL.</div>
                         </div>
 
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="BulletinImageAlt">Image alternative text</label>
+                            <input id="BulletinImageAlt"
+                                   is="emby-input"
+                                   maxlength="300"
+                                   placeholder="Describe the image for users who cannot see it" />
+                            <div class="fieldDescription">Leave empty only when the image is purely decorative.</div>
+                        </div>
+
                         <div class="bulletin-toolbar" role="toolbar" aria-label="Text formatting">
                             <button type="button" data-command="bold"><strong>B</strong></button>
                             <button type="button" data-command="italic"><em>I</em></button>
@@ -78,6 +108,9 @@
                              onkeyup="event.stopImmediatePropagation()"
                              onkeypress="event.stopImmediatePropagation()"
                              data-placeholder="Write the bulletin here…"></div>
+                        <div id="BulletinOverflowWarning" class="bulletin-overflow-warning" hidden>
+                            This content is taller than the home screen panel. Users will need to scroll to read all of it.
+                        </div>
 
                         <section class="bulletin-live-preview" aria-labelledby="BulletinPreviewHeading">
                             <div class="bulletin-preview-label">
@@ -105,6 +138,25 @@
                             <div class="fieldDescription">Published bulletins are immediately visible to every user.</div>
                         </div>
 
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="BulletinPinned" type="checkbox" is="emby-checkbox" />
+                                <span>Pin as the latest announcement</span>
+                            </label>
+                            <div class="fieldDescription">A pinned bulletin is shown first. Pinning this bulletin unpins any other bulletin.</div>
+                        </div>
+
+                        <div class="bulletin-schedule-grid">
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="BulletinPublishAt">Publish at (optional)</label>
+                                <input id="BulletinPublishAt" is="emby-input" type="datetime-local" />
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="BulletinUnpublishAt">Unpublish at (optional)</label>
+                                <input id="BulletinUnpublishAt" is="emby-input" type="datetime-local" />
+                            </div>
+                        </div>
+
                         <div class="bulletin-editor-actions">
                             <button is="emby-button" type="button" class="raised button-submit" id="BulletinApply">
                                 Apply changes
@@ -128,14 +180,18 @@
     <style>
         .bulletin-admin-layout { display:grid; grid-template-columns:minmax(13rem, 18rem) 1fr; gap:1.5rem; margin:1.5rem 0; }
         #BulletinItems { display:grid; gap:.5rem; margin-top:.75rem; }
-        .bulletin-item-button { width:100%; padding:.8rem; border:1px solid rgba(255,255,255,.14); border-radius:.5rem; background:rgba(255,255,255,.05); color:inherit; text-align:left; cursor:pointer; }
+        .bulletin-item-button { position:relative; width:100%; padding:.8rem .8rem .8rem 2rem; border:1px solid rgba(255,255,255,.14); border-radius:.5rem; background:rgba(255,255,255,.05); color:inherit; text-align:left; cursor:pointer; }
+        .bulletin-item-button::before { content:"⋮⋮"; position:absolute; inset-inline-start:.55rem; top:50%; opacity:.45; transform:translateY(-50%) rotate(90deg); }
         .bulletin-item-button[aria-current="true"] { border-color:#00a4dc; }
+        .bulletin-item-button.is-dragging { opacity:.4; }
+        .bulletin-item-button.is-drag-target { border-color:#00a4dc; transform:translateY(.1rem); }
         .bulletin-item-button small { display:block; margin-top:.2rem; opacity:.65; }
         .bulletin-toolbar { display:flex; flex-wrap:wrap; gap:.45rem; align-items:center; margin:.75rem 0; }
         .bulletin-toolbar button,.bulletin-toolbar label { box-sizing:border-box; min-height:2.4rem; padding:.5rem .7rem; border:1px solid rgba(255,255,255,.18); border-radius:.35rem; background:rgba(255,255,255,.08); color:inherit; }
         .bulletin-toolbar label { display:flex; align-items:center; gap:.5rem; }
         .bulletin-rich-editor { min-height:15rem; padding:1rem; border:1px solid rgba(255,255,255,.22); border-radius:.5rem; background:rgba(0,0,0,.18); line-height:1.6; }
         .bulletin-rich-editor:empty::before { content:attr(data-placeholder); opacity:.5; }
+        .bulletin-overflow-warning { margin:.65rem 0; padding:.7rem .8rem; border:1px solid #f0a000; border-radius:.45rem; background:color-mix(in srgb,#f0a000 12%,transparent); color:inherit; font-size:.9rem; }
         .bulletin-image-drop { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.75rem; margin:.65rem 0; padding:1rem; border:2px dashed rgba(255,255,255,.25); border-radius:.6rem; cursor:pointer; }
         .bulletin-image-drop:focus,.bulletin-image-drop.is-dragging { border-color:#00a4dc; outline:none; background:rgba(0,164,220,.08); }
         .bulletin-image-preview-wrap { display:flex; flex-wrap:wrap; align-items:flex-end; gap:.75rem; width:fit-content; max-width:100%; margin:.75rem 0; }
@@ -159,8 +215,9 @@
         .bulletin-preview-navigation span { display:grid; place-items:center; width:2.15rem; height:2.15rem; border:1px solid var(--bulletin-divider); border-radius:50%; background:var(--bulletin-subtle); font-size:1.55rem; }
         .bulletin-preview-navigation small { min-width:3.5rem; opacity:.68; text-align:center; }
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
+        .bulletin-schedule-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
         @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-home-image-preview { order:-1; height:10rem; border-inline-start:0; border-bottom:1px solid var(--bulletin-divider); } }
-        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } }
+        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } .bulletin-schedule-grid { grid-template-columns:1fr; } }
     </style>
 
     <script type="text/javascript">
@@ -171,6 +228,13 @@
 
             const value = (object, upper, lower) => object?.[upper] ?? object?.[lower];
             const current = () => items.find(item => value(item, 'Id', 'id') === selectedId);
+            const toLocalDateTime = date => {
+                if (!date) return '';
+                const parsed = new Date(date);
+                const local = new Date(parsed.getTime() - parsed.getTimezoneOffset() * 60000);
+                return local.toISOString().slice(0, 16);
+            };
+            const fromLocalDateTime = value => value ? new Date(value).toISOString() : null;
             const validImageUrl = url =>
                 /^https?:\/\//i.test(url || '')
                 || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
@@ -200,10 +264,15 @@
                     Id: String(value(item, 'Id', 'id') || '').replaceAll('-', '').toLowerCase(),
                     Title: value(item, 'Title', 'title') || '',
                     ImageUrl: value(item, 'ImageUrl', 'imageUrl') || null,
+                    ImageAlt: value(item, 'ImageAlt', 'imageAlt') || null,
                     Blocks: (value(item, 'Blocks', 'blocks') || []).map(normalizeBlock),
                     PublishedAt: value(item, 'PublishedAt', 'publishedAt'),
                     UpdatedAt: value(item, 'UpdatedAt', 'updatedAt'),
-                    IsPublished: Boolean(value(item, 'IsPublished', 'isPublished'))
+                    PublishAt: value(item, 'PublishAt', 'publishAt') || null,
+                    UnpublishAt: value(item, 'UnpublishAt', 'unpublishAt') || null,
+                    IsPublished: Boolean(value(item, 'IsPublished', 'isPublished')),
+                    IsPinned: Boolean(value(item, 'IsPinned', 'isPinned')),
+                    SortOrder: Number(value(item, 'SortOrder', 'sortOrder') || 0)
                 };
             }
 
@@ -214,8 +283,13 @@
                         Id: item.Id,
                         Title: item.Title,
                         ImageUrl: item.ImageUrl,
+                        ImageAlt: item.ImageAlt,
                         Blocks: item.Blocks,
-                        IsPublished: item.IsPublished
+                        PublishAt: item.PublishAt,
+                        UnpublishAt: item.UnpublishAt,
+                        IsPublished: item.IsPublished,
+                        IsPinned: item.IsPinned,
+                        SortOrder: item.SortOrder
                     }))
                     .sort((left, right) => left.Id.localeCompare(right.Id)));
             }
@@ -237,7 +311,9 @@
                 const item = current();
                 const title = page.querySelector('#BulletinTitle').value.trim();
                 page.querySelector('#BulletinPreviewTitle').textContent = title || 'Untitled bulletin';
-                const published = value(item, 'PublishedAt', 'publishedAt') || new Date().toISOString();
+                const published = value(item, 'PublishAt', 'publishAt')
+                    || value(item, 'PublishedAt', 'publishedAt')
+                    || new Date().toISOString();
                 const previewDate = page.querySelector('#BulletinPreviewDate');
                 previewDate.dateTime = published;
                 previewDate.textContent = new Intl.DateTimeFormat(undefined, {
@@ -261,7 +337,7 @@
                 const previewImage = page.querySelector('#BulletinHomeImagePreview');
                 if (validImageUrl(imageUrl)) {
                     previewImage.src = imageUrl;
-                    previewImage.alt = title || 'Bulletin image';
+                    previewImage.alt = page.querySelector('#BulletinImageAlt').value.trim();
                     previewImage.hidden = false;
                     previewFeature.classList.add('has-image');
                 } else {
@@ -270,6 +346,12 @@
                     previewImage.hidden = true;
                     previewFeature.classList.remove('has-image');
                 }
+
+                requestAnimationFrame(() => {
+                    const copy = page.querySelector('.bulletin-preview-copy');
+                    page.querySelector('#BulletinOverflowWarning').hidden =
+                        copy.scrollHeight <= copy.clientHeight + 2;
+                });
             }
 
             async function uploadImage(file) {
@@ -385,7 +467,13 @@
                 const imageUrl = value(item, 'ImageUrl', 'imageUrl') || '';
                 page.querySelector('#BulletinImageUrl').value = imageUrl;
                 showImagePreview(imageUrl);
+                page.querySelector('#BulletinImageAlt').value = value(item, 'ImageAlt', 'imageAlt') || '';
                 page.querySelector('#BulletinPublished').checked = Boolean(value(item, 'IsPublished', 'isPublished'));
+                page.querySelector('#BulletinPinned').checked = Boolean(value(item, 'IsPinned', 'isPinned'));
+                page.querySelector('#BulletinPublishAt').value =
+                    toLocalDateTime(value(item, 'PublishAt', 'publishAt'));
+                page.querySelector('#BulletinUnpublishAt').value =
+                    toLocalDateTime(value(item, 'UnpublishAt', 'unpublishAt'));
                 const editor = page.querySelector('#BulletinEditor');
                 editor.replaceChildren();
                 (value(item, 'Blocks', 'blocks') || []).forEach(block => {
@@ -412,17 +500,56 @@
                     const button = document.createElement('button');
                     button.type = 'button';
                     button.className = 'bulletin-item-button';
+                    button.draggable = true;
                     button.setAttribute('aria-current', String(value(item, 'Id', 'id') === selectedId));
                     const title = document.createElement('span');
                     title.textContent = value(item, 'Title', 'title') || 'Untitled draft';
                     const state = document.createElement('small');
-                    state.textContent = value(item, 'IsPublished', 'isPublished') ? 'Published' : 'Draft';
+                    const states = [];
+                    if (value(item, 'IsPinned', 'isPinned')) states.push('Pinned');
+                    if (value(item, 'IsPublished', 'isPublished')) {
+                        const publishAt = value(item, 'PublishAt', 'publishAt');
+                        const unpublishAt = value(item, 'UnpublishAt', 'unpublishAt');
+                        if (unpublishAt && new Date(unpublishAt) <= new Date()) states.push('Expired');
+                        else states.push(publishAt && new Date(publishAt) > new Date() ? 'Scheduled' : 'Published');
+                    } else {
+                        states.push('Draft');
+                    }
+                    state.textContent = states.join(' · ');
                     button.append(title, state);
                     button.addEventListener('click', () => {
                         if (selectedId !== value(item, 'Id', 'id') && !applyEditor()) return;
                         selectedId = value(item, 'Id', 'id');
                         renderList();
                         loadEditor(item);
+                    });
+                    button.addEventListener('dragstart', event => {
+                        button.classList.add('is-dragging');
+                        event.dataTransfer.effectAllowed = 'move';
+                        event.dataTransfer.setData('text/plain', value(item, 'Id', 'id'));
+                    });
+                    button.addEventListener('dragend', () => {
+                        button.classList.remove('is-dragging');
+                        host.querySelectorAll('.is-drag-target')
+                            .forEach(element => element.classList.remove('is-drag-target'));
+                    });
+                    button.addEventListener('dragover', event => {
+                        event.preventDefault();
+                        button.classList.add('is-drag-target');
+                    });
+                    button.addEventListener('dragleave', () => button.classList.remove('is-drag-target'));
+                    button.addEventListener('drop', event => {
+                        event.preventDefault();
+                        const draggedId = event.dataTransfer.getData('text/plain');
+                        const targetId = value(item, 'Id', 'id');
+                        if (!draggedId || draggedId === targetId) return;
+                        const from = items.findIndex(entry => value(entry, 'Id', 'id') === draggedId);
+                        const to = items.findIndex(entry => value(entry, 'Id', 'id') === targetId);
+                        if (from < 0 || to < 0) return;
+                        const [moved] = items.splice(from, 1);
+                        items.splice(to, 0, moved);
+                        items.forEach((entry, index) => entry.SortOrder = index);
+                        renderList();
                     });
                     host.append(button);
                 });
@@ -443,8 +570,22 @@
                     return false;
                 }
                 item.ImageUrl = imageUrl || null;
+                item.ImageAlt = page.querySelector('#BulletinImageAlt').value.trim() || null;
                 item.Blocks = serializeEditor();
                 item.IsPublished = page.querySelector('#BulletinPublished').checked;
+                item.IsPinned = page.querySelector('#BulletinPinned').checked;
+                if (item.IsPinned) {
+                    items.forEach(entry => {
+                        if (entry !== item) entry.IsPinned = false;
+                    });
+                }
+                item.PublishAt = fromLocalDateTime(page.querySelector('#BulletinPublishAt').value);
+                item.UnpublishAt = fromLocalDateTime(page.querySelector('#BulletinUnpublishAt').value);
+                if (item.PublishAt && item.UnpublishAt
+                    && new Date(item.UnpublishAt) <= new Date(item.PublishAt)) {
+                    Dashboard.alert('The unpublish time must be later than the publish time.');
+                    return false;
+                }
                 item.PublishedAt ||= new Date().toISOString();
                 renderList();
                 return true;
@@ -461,6 +602,11 @@
                     items = (value(response, 'Items', 'items') || []).map(normalizeItem);
                     page.querySelector('#BulletinVisibleCount').value =
                         String(value(response, 'VisibleItemCount', 'visibleItemCount') || 5);
+                    page.querySelector('#BulletinAutoRotate').checked =
+                        Boolean(value(response, 'AutoRotate', 'autoRotate') ?? true);
+                    page.querySelector('#BulletinRotationInterval').value =
+                        String(value(response, 'RotationIntervalSeconds', 'rotationIntervalSeconds') || 9);
+                    updateRotationSettings();
                     selectedId = items.length ? value(items[0], 'Id', 'id') : null;
                     renderList();
                     loadEditor(current());
@@ -478,7 +624,9 @@
             });
             ['keydown', 'keyup', 'keypress'].forEach(eventName => {
                 page.addEventListener(eventName, event => {
-                    if (event.target.closest?.('#BulletinTitle, #BulletinImageUrl, #BulletinEditor')) {
+                    if (event.target.closest?.(
+                        '#BulletinTitle, #BulletinImageUrl, #BulletinImageAlt, ' +
+                        '#BulletinPublishAt, #BulletinUnpublishAt, #BulletinEditor')) {
                         event.stopImmediatePropagation();
                     }
                 }, true);
@@ -488,7 +636,14 @@
                 updateHomePreview();
             });
             page.querySelector('#BulletinTitle').addEventListener('input', updateHomePreview);
+            page.querySelector('#BulletinImageAlt').addEventListener('input', updateHomePreview);
             page.querySelector('#BulletinEditor').addEventListener('input', updateHomePreview);
+            page.querySelector('#BulletinPublishAt').addEventListener('input', updateHomePreview);
+            function updateRotationSettings() {
+                page.querySelector('#BulletinRotationIntervalWrap').hidden =
+                    !page.querySelector('#BulletinAutoRotate').checked;
+            }
+            page.querySelector('#BulletinAutoRotate').addEventListener('change', updateRotationSettings);
             const imageDrop = page.querySelector('#BulletinImageDrop');
             const imageFile = page.querySelector('#BulletinImageFile');
             page.querySelector('#BulletinChooseImage').addEventListener('click', event => {
@@ -543,10 +698,15 @@
                     Id: id,
                     Title: '',
                     ImageUrl: null,
+                    ImageAlt: null,
                     Blocks: [{ Type: 'paragraph', Content: [], Items: [] }],
                     PublishedAt: new Date().toISOString(),
                     UpdatedAt: new Date().toISOString(),
-                    IsPublished: false
+                    PublishAt: null,
+                    UnpublishAt: null,
+                    IsPublished: false,
+                    IsPinned: false,
+                    SortOrder: 0
                 };
                 items.unshift(item);
                 selectedId = id;
@@ -565,10 +725,13 @@
             page.querySelector('#BulletinForm').addEventListener('submit', async event => {
                 event.preventDefault();
                 if (!applyEditor()) return false;
+                items.forEach((item, index) => item.SortOrder = index);
                 Dashboard.showLoadingMsg();
                 try {
                     const payload = {
                         VisibleItemCount: Number(page.querySelector('#BulletinVisibleCount').value),
+                        AutoRotate: page.querySelector('#BulletinAutoRotate').checked,
+                        RotationIntervalSeconds: Number(page.querySelector('#BulletinRotationInterval').value),
                         Items: items
                     };
                     const expectedSignature = contentSignature(items);

@@ -16,4 +16,14 @@ public sealed class PluginConfiguration : BasePluginConfiguration
     /// Gets or sets the number of items displayed on the home screen.
     /// </summary>
     public int VisibleItemCount { get; set; } = 5;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether announcements rotate automatically.
+    /// </summary>
+    public bool AutoRotate { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the automatic rotation interval in seconds.
+    /// </summary>
+    public int RotationIntervalSeconds { get; set; } = 9;
 }

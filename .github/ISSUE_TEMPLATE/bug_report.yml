@@ -1,0 +1,65 @@
+name: Bug report
+description: Report a reproducible problem with JellyBulletin
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Please remove private server URLs, access tokens and personal data from logs.
+  - type: input
+    id: jellyfin-version
+    attributes:
+      label: Jellyfin version
+      placeholder: 10.11.11
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: JellyBulletin version
+      placeholder: 0.3.0.0
+    validations:
+      required: true
+  - type: input
+    id: transformation-version
+    attributes:
+      label: File Transformation version
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: Client and browser
+      placeholder: Jellyfin Web 10.11.11, Firefox 128
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Open …
+        2. Select …
+        3. Observe …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Jellyfin logs
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I removed private URLs, tokens and personal data.
+          required: true
+        - label: I searched existing issues for this problem.
+          required: true

@@ -136,6 +136,14 @@
     background: color-mix(in srgb, var(--bulletin-accent) 18%, transparent);
 }
 
+.bulletin-pause {
+    font-size: .9rem;
+}
+
+.bulletin-arrow[hidden] {
+    display: none;
+}
+
 .bulletin-position {
     min-width: 3.5rem;
     color: var(--bulletin-muted);
