@@ -244,6 +244,11 @@
 
             const value = (object, upper, lower) => object?.[upper] ?? object?.[lower];
             const current = () => items.find(item => value(item, 'Id', 'id') === selectedId);
+            const normalizeTimestamp = timestamp => {
+                if (!timestamp) return null;
+                const parsed = new Date(timestamp);
+                return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+            };
             const toLocalDateTime = date => {
                 if (!date) return '';
                 const parsed = new Date(date);
@@ -297,10 +302,10 @@
                     ImageUrl: value(item, 'ImageUrl', 'imageUrl') || null,
                     ImageAlt: value(item, 'ImageAlt', 'imageAlt') || null,
                     Blocks: (value(item, 'Blocks', 'blocks') || []).map(normalizeBlock),
-                    PublishedAt: value(item, 'PublishedAt', 'publishedAt'),
-                    UpdatedAt: value(item, 'UpdatedAt', 'updatedAt'),
-                    PublishAt: value(item, 'PublishAt', 'publishAt') || null,
-                    UnpublishAt: value(item, 'UnpublishAt', 'unpublishAt') || null,
+                    PublishedAt: normalizeTimestamp(value(item, 'PublishedAt', 'publishedAt')),
+                    UpdatedAt: normalizeTimestamp(value(item, 'UpdatedAt', 'updatedAt')),
+                    PublishAt: normalizeTimestamp(value(item, 'PublishAt', 'publishAt')),
+                    UnpublishAt: normalizeTimestamp(value(item, 'UnpublishAt', 'unpublishAt')),
                     IsPublished: Boolean(value(item, 'IsPublished', 'isPublished')),
                     IsPinned: Boolean(value(item, 'IsPinned', 'isPinned')),
                     SortOrder: Number(value(item, 'SortOrder', 'sortOrder') || 0)

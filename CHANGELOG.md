@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.4.0 — Public beta
+
+- Normalize equivalent UTC timestamp formats before save verification.
+- Prevent false “server did not return the saved changes” errors for schedules.
+
 ## 0.3.3.0 — Public beta
 
 - Replace the local-only **Apply changes** action with **Save bulletin**.
