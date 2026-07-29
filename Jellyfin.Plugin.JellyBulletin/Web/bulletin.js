@@ -112,13 +112,16 @@
         const title = document.createElement('h2');
         const date = document.createElement('time');
         const contentHost = document.createElement('div');
+        const imageFrame = document.createElement('div');
+        imageFrame.className = 'bulletin-image-frame';
         const image = document.createElement('img');
         image.className = 'bulletin-image';
         image.loading = 'lazy';
-        image.hidden = true;
+        imageFrame.hidden = true;
+        imageFrame.append(image);
 
         body.append(title, date, contentHost);
-        feature.append(body, image);
+        feature.append(body, imageFrame);
         root.append(feature);
 
         const navigation = document.createElement('div');
@@ -186,12 +189,12 @@
             if (validImageUrl(imageUrl)) {
                 image.src = imageUrl;
                 image.alt = item.ImageAlt || item.imageAlt || '';
-                image.hidden = false;
+                imageFrame.hidden = false;
                 feature.classList.add('has-image');
             } else {
                 image.removeAttribute('src');
                 image.alt = '';
-                image.hidden = true;
+                imageFrame.hidden = true;
                 feature.classList.remove('has-image');
             }
             position.textContent = `${selectedIndex + 1} of ${items.length}`;

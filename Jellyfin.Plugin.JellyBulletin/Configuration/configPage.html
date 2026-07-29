@@ -123,7 +123,9 @@
                                     <time id="BulletinPreviewDate"></time>
                                     <div id="BulletinPreviewBody" class="bulletin-preview-body"></div>
                                 </article>
-                                <img id="BulletinHomeImagePreview" class="bulletin-home-image-preview" alt="" hidden />
+                                <div id="BulletinHomeImagePreviewFrame" class="bulletin-home-image-preview-frame" hidden>
+                                    <img id="BulletinHomeImagePreview" class="bulletin-home-image-preview" alt="" />
+                                </div>
                             </div>
                             <div class="bulletin-preview-navigation" aria-hidden="true">
                                 <span>‹</span><small>1 of 3</small><span>›</span>
@@ -223,15 +225,16 @@
         .bulletin-preview-body p { margin:.3rem 0; }
         .bulletin-preview-body ul,.bulletin-preview-body ol { margin:.35rem 0; padding-inline-start:1.2rem; }
         .bulletin-preview-body a { color:var(--bulletin-accent); text-decoration:underline; text-underline-offset:.15em; }
-        .bulletin-home-image-preview { box-sizing:border-box; display:block; width:calc(100% - 1.1rem); height:calc(100% - 1.1rem); min-height:0; margin:.55rem; border-radius:.45rem; object-fit:contain; background:color-mix(in srgb,var(--bulletin-text) 6%,transparent); }
-        .bulletin-home-image-preview[hidden] { display:none; }
+        .bulletin-home-image-preview-frame { box-sizing:border-box; display:flex; align-items:center; justify-content:center; width:calc(100% - 1.1rem); height:calc(100% - 1.1rem); min-height:0; margin:.55rem; overflow:hidden; border-radius:.45rem; background:color-mix(in srgb,var(--bulletin-text) 6%,transparent); }
+        .bulletin-home-image-preview-frame[hidden] { display:none; }
+        .bulletin-home-image-preview { display:block; width:auto; height:auto; max-width:100%; max-height:100%; border-radius:.38rem; object-fit:contain; }
         .bulletin-preview-navigation { display:flex; align-items:center; justify-content:center; gap:.75rem; min-height:2.8rem; border-top:1px solid var(--bulletin-divider); }
         .bulletin-preview-navigation span { display:grid; place-items:center; width:2.15rem; height:2.15rem; border:1px solid var(--bulletin-divider); border-radius:50%; background:var(--bulletin-subtle); font-size:1.55rem; }
         .bulletin-preview-navigation small { min-width:3.5rem; opacity:.68; text-align:center; }
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
         .bulletin-schedule-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
         .bulletin-datetime-input { box-sizing:border-box; width:100%; min-height:2.8rem; padding:.55rem .7rem; border:1px solid var(--jf-palette-divider,rgba(255,255,255,.2)); border-radius:.25rem; background:var(--jf-palette-background-paper,rgba(255,255,255,.14)); color:inherit; }
-        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-home-image-preview { order:-1; width:calc(100% - .8rem); height:9.2rem; margin:.4rem; border-radius:.35rem; } }
+        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-home-image-preview-frame { order:-1; width:calc(100% - .8rem); height:9.2rem; margin:.4rem; border-radius:.35rem; } .bulletin-home-image-preview { border-radius:.3rem; } }
         @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } .bulletin-schedule-grid { grid-template-columns:1fr; } }
     </style>
 
@@ -371,16 +374,17 @@
 
                 const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
                 const previewFeature = page.querySelector('#BulletinPreviewFeature');
+                const previewImageFrame = page.querySelector('#BulletinHomeImagePreviewFrame');
                 const previewImage = page.querySelector('#BulletinHomeImagePreview');
                 if (validImageUrl(imageUrl)) {
                     previewImage.src = imageUrl;
                     previewImage.alt = page.querySelector('#BulletinImageAlt').value.trim();
-                    previewImage.hidden = false;
+                    previewImageFrame.hidden = false;
                     previewFeature.classList.add('has-image');
                 } else {
                     previewImage.removeAttribute('src');
                     previewImage.alt = '';
-                    previewImage.hidden = true;
+                    previewImageFrame.hidden = true;
                     previewFeature.classList.remove('has-image');
                 }
 

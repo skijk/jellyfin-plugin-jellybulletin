@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.8.0 — Public beta
+
+- Round the actual fitted image element instead of only its container.
+- Preserve rounded image corners for wide, tall and square contain-fit images.
+
 ## 0.3.7.0 — Public beta
 
 - Round inset bulletin image corners to match the surrounding panel.
