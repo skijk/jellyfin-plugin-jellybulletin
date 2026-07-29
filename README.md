@@ -6,7 +6,7 @@
 
 <p align="center"><strong>News and announcements on the Jellyfin home screen.</strong></p>
 
-![JellyBulletin presenting a digital announcement](docs/images/jellybulletin-hero.png)
+![JellyBulletin beta announcement on the Jellyfin home screen](docs/images/jellybulletin-home-beta.png)
 
 > Public beta. JellyBulletin is tested against Jellyfin 10.11.11 and currently
 > targets Jellyfin Web and web-based clients.
@@ -108,7 +108,8 @@ assisted with implementation, review, release packaging and documentation.
 
 ## Media assets
 
-The generated [wide hero](docs/images/jellybulletin-hero.png) and
+The real [beta home-screen screenshot](docs/images/jellybulletin-home-beta.png),
+generated [wide hero](docs/images/jellybulletin-hero.png) and
 [square social image](docs/images/jellybulletin-social.png) may be used when
 sharing or discussing JellyBulletin.
 
