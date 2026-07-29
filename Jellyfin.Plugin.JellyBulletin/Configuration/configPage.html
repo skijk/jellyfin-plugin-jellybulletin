@@ -71,13 +71,13 @@
                         </div>
 
                         <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="BulletinImageUrl">Image (optional)</label>
+                            <label class="inputLabel inputLabelUnfocused" for="BulletinImageUrl">Stored image (optional)</label>
                             <input id="BulletinImageUrl"
                                    is="emby-input"
                                    type="text"
-                                   inputmode="url"
-                                   placeholder="https://…"
-                                   maxlength="2048" />
+                                   placeholder="Upload, paste or drop an image below"
+                                   maxlength="2048"
+                                   readonly />
                             <input id="BulletinImageFile"
                                    type="file"
                                    accept="image/png,image/jpeg,image/webp"
@@ -94,7 +94,7 @@
                                     Remove image
                                 </button>
                             </div>
-                            <div class="fieldDescription">PNG, JPEG or WebP, up to 8 MB. You can also use an HTTP or HTTPS URL.</div>
+                            <div class="fieldDescription">PNG, JPEG or WebP, up to 8 MB. Images are stored locally to prevent third-party authentication prompts and tracking.</div>
                         </div>
 
                         <div class="inputContainer">
@@ -297,8 +297,7 @@
                 return parsed.toISOString();
             };
             const validImageUrl = url =>
-                /^https?:\/\//i.test(url || '')
-                || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
+                /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
             const normalizePanelHeight = height =>
                 height === 'compact' || height === 'tall' ? height : 'standard';
 
@@ -696,7 +695,7 @@
                 item.Title = title;
                 const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
                 if (imageUrl && !validImageUrl(imageUrl)) {
-                    Dashboard.alert('Use an uploaded image or a URL that starts with http:// or https://.');
+                    Dashboard.alert('Remove the legacy external image and upload it to JellyBulletin instead.');
                     return false;
                 }
                 item.ImageUrl = imageUrl || null;

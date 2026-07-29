@@ -19,8 +19,7 @@
     }
 
     function validImageUrl(url) {
-        return /^https?:\/\//i.test(url || '')
-            || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
+        return /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
     }
 
     function createInline(run) {

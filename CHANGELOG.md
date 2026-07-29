@@ -2,6 +2,12 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.18.0
+
+- Prevent browser Basic Auth prompts caused by protected external bulletin images.
+- Display only images uploaded to JellyBulletin's local image storage.
+- Keep image support without third-party authentication requests or tracking.
+
 ## 0.3.17.0
 
 - Use the full panel width in text-only mode.
