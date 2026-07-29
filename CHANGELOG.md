@@ -2,6 +2,10 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.15.0 — Public beta
+
+- Present the plugin logo on a centered 16:9 catalog canvas with safe spacing.
+
 ## 0.3.14.0 — Public beta
 
 - Add Compact, Standard and Tall announcement panel heights.
