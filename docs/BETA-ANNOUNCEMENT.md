@@ -68,6 +68,12 @@ File Transformation version and relevant Jellyfin logs.
 
 ### Post
 
+**AI disclosure:** JellyBulletin was developed with extensive assistance from
+OpenAI Codex. I directed the product design, requirements and testing, while
+Codex assisted with implementation, review, packaging and documentation. The
+plugin has been tested on my own Jellyfin server, and the use of AI assistance
+is also documented in the project README.
+
 I have released the public beta of JellyBulletin, a plugin for publishing
 server news, maintenance notices and other announcements directly on the
 Jellyfin home screen.
