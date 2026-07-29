@@ -29,6 +29,14 @@
 
                 <div class="checkboxContainer checkboxContainer-withDescription">
                     <label class="emby-checkbox-label">
+                        <input id="BulletinShowImages" type="checkbox" is="emby-checkbox" />
+                        <span>Show images on the home screen</span>
+                    </label>
+                    <div class="fieldDescription">Images remain attached to bulletins when hidden. Turning this off uses a lower, text-focused layout.</div>
+                </div>
+
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label class="emby-checkbox-label">
                         <input id="BulletinAutoRotate" type="checkbox" is="emby-checkbox" />
                         <span>Rotate announcements automatically</span>
                     </label>
@@ -395,7 +403,7 @@
                 const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
                 const previewImageFrame = page.querySelector('#BulletinHomeImagePreviewFrame');
                 const previewImage = page.querySelector('#BulletinHomeImagePreview');
-                if (validImageUrl(imageUrl)) {
+                if (page.querySelector('#BulletinShowImages').checked && validImageUrl(imageUrl)) {
                     previewImage.src = imageUrl;
                     previewImage.alt = page.querySelector('#BulletinImageAlt').value.trim();
                     previewImageFrame.hidden = false;
@@ -734,6 +742,8 @@
                         String(value(response, 'VisibleItemCount', 'visibleItemCount') || 5);
                     page.querySelector('#BulletinPanelHeight').value = normalizePanelHeight(
                         value(response, 'PanelHeight', 'panelHeight'));
+                    page.querySelector('#BulletinShowImages').checked =
+                        Boolean(value(response, 'ShowImages', 'showImages') ?? true);
                     page.querySelector('#BulletinAutoRotate').checked =
                         Boolean(value(response, 'AutoRotate', 'autoRotate') ?? true);
                     page.querySelector('#BulletinRotationInterval').value =
@@ -807,6 +817,7 @@
             });
             page.querySelector('#BulletinTitle').addEventListener('input', updateHomePreview);
             page.querySelector('#BulletinPanelHeight').addEventListener('change', updateHomePreview);
+            page.querySelector('#BulletinShowImages').addEventListener('change', updateHomePreview);
             page.querySelector('#BulletinImageAlt').addEventListener('input', updateHomePreview);
             page.querySelector('#BulletinEditor').addEventListener('input', updateHomePreview);
             page.querySelector('#BulletinPublishAt').addEventListener('input', updateHomePreview);
@@ -918,6 +929,7 @@
                     const payload = {
                         VisibleItemCount: Number(page.querySelector('#BulletinVisibleCount').value),
                         PanelHeight: normalizePanelHeight(page.querySelector('#BulletinPanelHeight').value),
+                        ShowImages: page.querySelector('#BulletinShowImages').checked,
                         AutoRotate: page.querySelector('#BulletinAutoRotate').checked,
                         RotationIntervalSeconds: Number(page.querySelector('#BulletinRotationInterval').value),
                         Items: items

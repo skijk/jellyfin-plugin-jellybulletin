@@ -38,6 +38,7 @@ public sealed partial class BulletinStore
         {
             VisibleItemCount = Math.Clamp(configuration.VisibleItemCount, 3, 5),
             PanelHeight = NormalizePanelHeight(configuration.PanelHeight),
+            ShowImages = configuration.ShowImages,
             AutoRotate = configuration.AutoRotate,
             RotationIntervalSeconds = Math.Clamp(configuration.RotationIntervalSeconds, 5, 30),
             Items = items
@@ -50,6 +51,7 @@ public sealed partial class BulletinStore
         {
             VisibleItemCount = Math.Clamp(Plugin.Instance.Configuration.VisibleItemCount, 3, 5),
             PanelHeight = NormalizePanelHeight(Plugin.Instance.Configuration.PanelHeight),
+            ShowImages = Plugin.Instance.Configuration.ShowImages,
             AutoRotate = Plugin.Instance.Configuration.AutoRotate,
             RotationIntervalSeconds = Math.Clamp(Plugin.Instance.Configuration.RotationIntervalSeconds, 5, 30),
             Items = ReadItems()
@@ -83,6 +85,7 @@ public sealed partial class BulletinStore
         var configuration = Plugin.Instance.Configuration;
         configuration.VisibleItemCount = Math.Clamp(request.VisibleItemCount, 3, 5);
         configuration.PanelHeight = NormalizePanelHeight(request.PanelHeight);
+        configuration.ShowImages = request.ShowImages;
         configuration.AutoRotate = request.AutoRotate;
         configuration.RotationIntervalSeconds = Math.Clamp(request.RotationIntervalSeconds, 5, 30);
         configuration.NewsJson = JsonConvert.SerializeObject(request.Items);

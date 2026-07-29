@@ -93,9 +93,10 @@
         const panelHeight = requestedPanelHeight === 'compact' || requestedPanelHeight === 'tall'
             ? requestedPanelHeight
             : 'standard';
+        const showImages = Boolean(data.ShowImages ?? data.showImages ?? true);
         const rotationSeconds = Math.max(5, Math.min(30,
             Number(data.RotationIntervalSeconds ?? data.rotationIntervalSeconds ?? 9)));
-        const signature = JSON.stringify({ items, autoRotate, rotationSeconds, panelHeight });
+        const signature = JSON.stringify({ items, autoRotate, rotationSeconds, panelHeight, showImages });
         const existing = document.getElementById(ROOT_ID);
         if (signature === lastSignature && existing) {
             if (existing.parentElement !== home) home.prepend(existing);
@@ -106,6 +107,7 @@
         const root = document.createElement('section');
         root.id = ROOT_ID;
         root.className = `jellyfin-bulletin bulletin-height-${panelHeight}`;
+        root.classList.toggle('bulletin-images-hidden', !showImages);
         root.setAttribute('aria-label', 'News');
 
         const feature = document.createElement('div');
@@ -190,7 +192,7 @@
             });
             contentHost.replaceChildren(createContent(item));
             const imageUrl = item.ImageUrl || item.imageUrl;
-            if (validImageUrl(imageUrl)) {
+            if (showImages && validImageUrl(imageUrl)) {
                 image.src = imageUrl;
                 image.alt = item.ImageAlt || item.imageAlt || '';
                 imageFrame.hidden = false;

@@ -34,6 +34,14 @@
     height: clamp(22rem, 32vw, 29rem);
 }
 
+.bulletin-images-hidden .bulletin-feature {
+    height: clamp(10.5rem, 14vw, 13.5rem);
+}
+
+.bulletin-images-hidden .bulletin-active {
+    padding-block: clamp(1rem, 2vw, 1.5rem);
+}
+
 .bulletin-feature.has-image {
     grid-template-columns: minmax(0, 1.25fr) minmax(18rem, .75fr);
 }

@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.16.0
+
+- Add a global **Show images on the home screen** setting.
+- Preserve uploaded artwork while using a lower text-focused layout when images are hidden.
+
 ## 0.3.15.0 — Public beta
 
 - Present the plugin logo on a centered 16:9 catalog canvas with safe spacing.
