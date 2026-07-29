@@ -2,6 +2,12 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.11.0 — Public beta
+
+- Preserve the editor selection when using formatting controls, colors and links.
+- Serialize Safari's computed bold, italic and underline styles.
+- Keep rich formatting and list structure through the save-and-reload cycle.
+
 ## 0.3.10.0 — Public beta
 
 - Remove macOS resource-fork files from the release archive.

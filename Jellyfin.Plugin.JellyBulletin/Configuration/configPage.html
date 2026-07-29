@@ -243,6 +243,7 @@
             const page = document.querySelector('#BulletinConfigPage');
             let items = [];
             let selectedId = null;
+            let editorSelection = null;
             page.querySelector('#BulletinTimezone').textContent =
                 Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local time';
 
@@ -450,11 +451,15 @@
                 if (tag === 'a' && /^https?:\/\//i.test(node.href)) next.Href = node.href;
 
                 const style = node.style;
-                const fontWeight = style?.fontWeight || '';
+                const computedStyle = window.getComputedStyle(node);
+                const fontWeight = style?.fontWeight || computedStyle.fontWeight || '';
                 if (fontWeight === 'bold' || Number.parseInt(fontWeight, 10) >= 600) next.Bold = true;
-                if (style?.fontStyle === 'italic' || style?.fontStyle === 'oblique') next.Italic = true;
+                const fontStyle = style?.fontStyle || computedStyle.fontStyle;
+                if (fontStyle === 'italic' || fontStyle === 'oblique') next.Italic = true;
                 if ((style?.textDecoration || '').includes('underline')
-                    || (style?.textDecorationLine || '').includes('underline')) {
+                    || (style?.textDecorationLine || '').includes('underline')
+                    || (computedStyle.textDecorationLine || '').includes('underline')
+                    || (computedStyle.webkitTextDecorationsInEffect || '').includes('underline')) {
                     next.Underline = true;
                 }
 
@@ -674,10 +679,36 @@
                 }
             }
 
+            function rememberEditorSelection() {
+                const editor = page.querySelector('#BulletinEditor');
+                const selection = window.getSelection();
+                if (!selection?.rangeCount) return;
+                const range = selection.getRangeAt(0);
+                if (editor.contains(range.commonAncestorContainer)) {
+                    editorSelection = range.cloneRange();
+                }
+            }
+
+            function restoreEditorSelection() {
+                if (!editorSelection) return;
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(editorSelection);
+            }
+
+            page.querySelectorAll('.bulletin-toolbar button').forEach(button => {
+                button.addEventListener('mousedown', event => {
+                    event.preventDefault();
+                    restoreEditorSelection();
+                });
+            });
             page.querySelectorAll('[data-command]').forEach(button => {
                 button.addEventListener('click', () => {
+                    restoreEditorSelection();
+                    document.execCommand('styleWithCSS', false, false);
                     document.execCommand(button.dataset.command, false, null);
                     page.querySelector('#BulletinEditor').focus();
+                    rememberEditorSelection();
                     updateHomePreview();
                 });
             });
@@ -690,8 +721,15 @@
                     }
                 }, true);
             });
+            page.querySelector('#BulletinEditor').addEventListener('keyup', rememberEditorSelection);
+            page.querySelector('#BulletinEditor').addEventListener('mouseup', rememberEditorSelection);
+            page.querySelector('#BulletinEditor').addEventListener('input', rememberEditorSelection);
+            page.querySelector('#BulletinColor').addEventListener('mousedown', rememberEditorSelection);
             page.querySelector('#BulletinColor').addEventListener('input', event => {
+                restoreEditorSelection();
+                document.execCommand('styleWithCSS', false, false);
                 document.execCommand('foreColor', false, event.target.value);
+                rememberEditorSelection();
                 updateHomePreview();
             });
             page.querySelector('#BulletinTitle').addEventListener('input', updateHomePreview);
@@ -751,8 +789,13 @@
                 updateHomePreview();
             });
             page.querySelector('#BulletinLink').addEventListener('click', () => {
+                restoreEditorSelection();
                 const url = window.prompt('Link URL (https://…)');
-                if (url && /^https?:\/\//i.test(url)) document.execCommand('createLink', false, url);
+                restoreEditorSelection();
+                if (url && /^https?:\/\//i.test(url)) {
+                    document.execCommand('createLink', false, url);
+                    rememberEditorSelection();
+                }
                 else if (url) Dashboard.alert('The link must start with http:// or https://.');
                 updateHomePreview();
             });
