@@ -2,6 +2,12 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.10.0 — Public beta
+
+- Remove macOS resource-fork files from the release archive.
+- Prevent Jellyfin from attempting to load an invalid `._Jellyfin.Plugin.JellyBulletin.dll`.
+- Retain the rich-text persistence fixes from 0.3.9.0.
+
 ## 0.3.9.0 — Public beta
 
 - Preserve Safari inline styles when serializing rich text.
