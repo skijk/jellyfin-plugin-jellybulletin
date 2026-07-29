@@ -74,6 +74,7 @@ public sealed partial class BulletinStore
             item.Id = item.Id == Guid.Empty ? Guid.NewGuid() : item.Id;
             item.UpdatedAt = now;
             item.PublishedAt = item.PublishedAt == default ? now : item.PublishedAt;
+            item.IsPublished = item.IsPublished || item.PublishAt.HasValue;
             item.SortOrder = index;
         }
 

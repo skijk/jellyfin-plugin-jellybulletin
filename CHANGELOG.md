@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.5.0 — Public beta
+
+- Automatically enable a bulletin when a publish time is configured.
+- Enforce scheduled activation on both the admin page and server.
+
 ## 0.3.4.0 — Public beta
 
 - Normalize equivalent UTC timestamp formats before save verification.

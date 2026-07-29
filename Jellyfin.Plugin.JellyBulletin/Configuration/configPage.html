@@ -168,6 +168,7 @@
                         </div>
                         <div class="fieldDescription">
                             Times use your browser timezone: <span id="BulletinTimezone">Local time</span>.
+                            Setting a publish time automatically enables the bulletin.
                         </div>
 
                         <div class="bulletin-editor-actions">
@@ -622,6 +623,10 @@
                     Dashboard.alert(error.message);
                     return false;
                 }
+                if (item.PublishAt) {
+                    item.IsPublished = true;
+                    page.querySelector('#BulletinPublished').checked = true;
+                }
                 if (item.PublishAt && item.UnpublishAt
                     && new Date(item.UnpublishAt) <= new Date(item.PublishAt)) {
                     Dashboard.alert('The unpublish time must be later than the publish time.');
@@ -680,6 +685,11 @@
             page.querySelector('#BulletinImageAlt').addEventListener('input', updateHomePreview);
             page.querySelector('#BulletinEditor').addEventListener('input', updateHomePreview);
             page.querySelector('#BulletinPublishAt').addEventListener('input', updateHomePreview);
+            page.querySelector('#BulletinPublishAt').addEventListener('change', event => {
+                if (event.target.value.trim()) {
+                    page.querySelector('#BulletinPublished').checked = true;
+                }
+            });
             function updateRotationSettings() {
                 page.querySelector('#BulletinRotationIntervalWrap').hidden =
                     !page.querySelector('#BulletinAutoRotate').checked;
