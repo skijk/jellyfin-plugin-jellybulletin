@@ -111,7 +111,8 @@ assisted with implementation, review, release packaging and documentation.
 The real [beta home-screen screenshot](docs/images/jellybulletin-home-beta.png),
 generated [wide hero](docs/images/jellybulletin-hero.png) and
 [square social image](docs/images/jellybulletin-social.png) may be used when
-sharing or discussing JellyBulletin.
+sharing or discussing JellyBulletin. Ready-to-use launch copy is available in
+the [public-beta announcement](docs/BETA-ANNOUNCEMENT.md).
 
 ## License
 
