@@ -37,6 +37,7 @@ public sealed partial class BulletinStore
         return new BulletinResponse
         {
             VisibleItemCount = Math.Clamp(configuration.VisibleItemCount, 3, 5),
+            PanelHeight = NormalizePanelHeight(configuration.PanelHeight),
             AutoRotate = configuration.AutoRotate,
             RotationIntervalSeconds = Math.Clamp(configuration.RotationIntervalSeconds, 5, 30),
             Items = items
@@ -48,6 +49,7 @@ public sealed partial class BulletinStore
         return new SaveBulletinsRequest
         {
             VisibleItemCount = Math.Clamp(Plugin.Instance.Configuration.VisibleItemCount, 3, 5),
+            PanelHeight = NormalizePanelHeight(Plugin.Instance.Configuration.PanelHeight),
             AutoRotate = Plugin.Instance.Configuration.AutoRotate,
             RotationIntervalSeconds = Math.Clamp(Plugin.Instance.Configuration.RotationIntervalSeconds, 5, 30),
             Items = ReadItems()
@@ -80,6 +82,7 @@ public sealed partial class BulletinStore
 
         var configuration = Plugin.Instance.Configuration;
         configuration.VisibleItemCount = Math.Clamp(request.VisibleItemCount, 3, 5);
+        configuration.PanelHeight = NormalizePanelHeight(request.PanelHeight);
         configuration.AutoRotate = request.AutoRotate;
         configuration.RotationIntervalSeconds = Math.Clamp(request.RotationIntervalSeconds, 5, 30);
         configuration.NewsJson = JsonConvert.SerializeObject(request.Items);
@@ -185,5 +188,10 @@ public sealed partial class BulletinStore
         return Path.GetFileName(fileName) == fileName
             && Guid.TryParseExact(Path.GetFileNameWithoutExtension(fileName), "N", out _)
             && extension is ".png" or ".jpg" or ".webp";
+    }
+
+    private static string NormalizePanelHeight(string? value)
+    {
+        return value is "compact" or "tall" ? value : "standard";
     }
 }

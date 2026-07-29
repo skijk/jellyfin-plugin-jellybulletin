@@ -89,9 +89,13 @@
         if (!home) return;
 
         const autoRotate = Boolean(data.AutoRotate ?? data.autoRotate ?? true);
+        const requestedPanelHeight = data.PanelHeight ?? data.panelHeight;
+        const panelHeight = requestedPanelHeight === 'compact' || requestedPanelHeight === 'tall'
+            ? requestedPanelHeight
+            : 'standard';
         const rotationSeconds = Math.max(5, Math.min(30,
             Number(data.RotationIntervalSeconds ?? data.rotationIntervalSeconds ?? 9)));
-        const signature = JSON.stringify({ items, autoRotate, rotationSeconds });
+        const signature = JSON.stringify({ items, autoRotate, rotationSeconds, panelHeight });
         const existing = document.getElementById(ROOT_ID);
         if (signature === lastSignature && existing) {
             if (existing.parentElement !== home) home.prepend(existing);
@@ -101,7 +105,7 @@
 
         const root = document.createElement('section');
         root.id = ROOT_ID;
-        root.className = 'jellyfin-bulletin';
+        root.className = `jellyfin-bulletin bulletin-height-${panelHeight}`;
         root.setAttribute('aria-label', 'News');
 
         const feature = document.createElement('div');

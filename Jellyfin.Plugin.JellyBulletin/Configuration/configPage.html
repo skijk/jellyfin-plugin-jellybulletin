@@ -17,6 +17,16 @@
                     </select>
                 </div>
 
+                <div class="selectContainer">
+                    <label class="selectLabel" for="BulletinPanelHeight">Announcement panel height</label>
+                    <select id="BulletinPanelHeight" is="emby-select" class="emby-select-withcolor emby-select">
+                        <option value="compact">Compact</option>
+                        <option value="standard">Standard</option>
+                        <option value="tall">Tall</option>
+                    </select>
+                    <div class="fieldDescription">Controls the height of the complete announcement panel for every user.</div>
+                </div>
+
                 <div class="checkboxContainer checkboxContainer-withDescription">
                     <label class="emby-checkbox-label">
                         <input id="BulletinAutoRotate" type="checkbox" is="emby-checkbox" />
@@ -217,6 +227,8 @@
         .bulletin-preview-label h2 { margin:0; font-size:1rem; }
         .bulletin-preview-label span { opacity:.58; font-size:.8rem; }
         .bulletin-preview-feature { display:grid; grid-template-columns:minmax(0,1fr); width:100%; aspect-ratio:45 / 11; overflow:hidden; }
+        .bulletin-preview-feature.height-compact { aspect-ratio:5 / 1; }
+        .bulletin-preview-feature.height-tall { aspect-ratio:13 / 4; }
         .bulletin-preview-feature.has-image { grid-template-columns:minmax(0,1.25fr) minmax(15rem,.75fr); }
         .bulletin-preview-copy { min-width:0; overflow:hidden; padding:1rem 1.2rem; scrollbar-width:thin; }
         .bulletin-preview-copy h3 { margin:0 0 .15rem; font-size:1.25rem; line-height:1.15; }
@@ -234,8 +246,8 @@
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
         .bulletin-schedule-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
         .bulletin-datetime-input { box-sizing:border-box; width:100%; min-height:2.8rem; padding:.55rem .7rem; border:1px solid var(--jf-palette-divider,rgba(255,255,255,.2)); border-radius:.25rem; background:var(--jf-palette-background-paper,rgba(255,255,255,.14)); color:inherit; }
-        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-home-image-preview-frame { order:-1; width:calc(100% - .8rem); height:9.2rem; margin:.4rem; border-radius:.35rem; } .bulletin-home-image-preview { border-radius:.3rem; } }
-        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } .bulletin-schedule-grid { grid-template-columns:1fr; } }
+        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-preview-feature.height-compact { height:21rem; } .bulletin-preview-feature.height-tall { height:34rem; } .bulletin-home-image-preview-frame { order:-1; width:calc(100% - .8rem); height:9.2rem; margin:.4rem; border-radius:.35rem; } .bulletin-home-image-preview { border-radius:.3rem; } }
+        @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-feature.height-compact { height:21rem; } .bulletin-preview-feature.height-tall { height:34rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } .bulletin-schedule-grid { grid-template-columns:1fr; } }
     </style>
 
     <script type="text/javascript">
@@ -279,6 +291,8 @@
             const validImageUrl = url =>
                 /^https?:\/\//i.test(url || '')
                 || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
+            const normalizePanelHeight = height =>
+                height === 'compact' || height === 'tall' ? height : 'standard';
 
             function normalizeInline(run) {
                 return {
@@ -364,6 +378,11 @@
                 }).format(new Date(published));
 
                 const editor = page.querySelector('#BulletinEditor');
+                const previewFeature = page.querySelector('#BulletinPreviewFeature');
+                const panelHeight = normalizePanelHeight(
+                    page.querySelector('#BulletinPanelHeight').value);
+                previewFeature.classList.remove('height-compact', 'height-standard', 'height-tall');
+                previewFeature.classList.add(`height-${panelHeight}`);
                 const previewBody = page.querySelector('#BulletinPreviewBody');
                 previewBody.replaceChildren(...[...editor.childNodes].map(node => node.cloneNode(true)));
                 if (!previewBody.textContent.trim()) {
@@ -374,7 +393,6 @@
                 }
 
                 const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
-                const previewFeature = page.querySelector('#BulletinPreviewFeature');
                 const previewImageFrame = page.querySelector('#BulletinHomeImagePreviewFrame');
                 const previewImage = page.querySelector('#BulletinHomeImagePreview');
                 if (validImageUrl(imageUrl)) {
@@ -714,6 +732,8 @@
                     items = (value(response, 'Items', 'items') || []).map(normalizeItem);
                     page.querySelector('#BulletinVisibleCount').value =
                         String(value(response, 'VisibleItemCount', 'visibleItemCount') || 5);
+                    page.querySelector('#BulletinPanelHeight').value = normalizePanelHeight(
+                        value(response, 'PanelHeight', 'panelHeight'));
                     page.querySelector('#BulletinAutoRotate').checked =
                         Boolean(value(response, 'AutoRotate', 'autoRotate') ?? true);
                     page.querySelector('#BulletinRotationInterval').value =
@@ -786,6 +806,7 @@
                 updateHomePreview();
             });
             page.querySelector('#BulletinTitle').addEventListener('input', updateHomePreview);
+            page.querySelector('#BulletinPanelHeight').addEventListener('change', updateHomePreview);
             page.querySelector('#BulletinImageAlt').addEventListener('input', updateHomePreview);
             page.querySelector('#BulletinEditor').addEventListener('input', updateHomePreview);
             page.querySelector('#BulletinPublishAt').addEventListener('input', updateHomePreview);
@@ -896,6 +917,7 @@
                 try {
                     const payload = {
                         VisibleItemCount: Number(page.querySelector('#BulletinVisibleCount').value),
+                        PanelHeight: normalizePanelHeight(page.querySelector('#BulletinPanelHeight').value),
                         AutoRotate: page.querySelector('#BulletinAutoRotate').checked,
                         RotationIntervalSeconds: Number(page.querySelector('#BulletinRotationInterval').value),
                         Items: items

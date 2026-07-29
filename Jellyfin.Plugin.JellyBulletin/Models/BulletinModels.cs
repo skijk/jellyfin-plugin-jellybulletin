@@ -67,6 +67,8 @@ public sealed class SaveBulletinsRequest
 {
     public int VisibleItemCount { get; set; } = 5;
 
+    public string PanelHeight { get; set; } = "standard";
+
     public bool AutoRotate { get; set; } = true;
 
     public int RotationIntervalSeconds { get; set; } = 9;
@@ -80,6 +82,8 @@ public sealed class SaveBulletinsRequest
 public sealed class BulletinResponse
 {
     public int VisibleItemCount { get; set; }
+
+    public string PanelHeight { get; set; } = "standard";
 
     public bool AutoRotate { get; set; }
 

@@ -18,6 +18,11 @@ public sealed class PluginConfiguration : BasePluginConfiguration
     public int VisibleItemCount { get; set; } = 5;
 
     /// <summary>
+    /// Gets or sets the home-screen announcement panel height.
+    /// </summary>
+    public string PanelHeight { get; set; } = "standard";
+
+    /// <summary>
     /// Gets or sets a value indicating whether announcements rotate automatically.
     /// </summary>
     public bool AutoRotate { get; set; } = true;
