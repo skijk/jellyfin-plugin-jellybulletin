@@ -59,13 +59,13 @@
 .bulletin-image {
     box-sizing: border-box;
     display: block;
-    width: 100%;
-    height: 100%;
+    width: calc(100% - 2rem);
+    height: calc(100% - 2rem);
     min-height: 0;
-    padding: clamp(.8rem, 1.5vw, 1.25rem);
+    margin: 1rem;
+    border-radius: .75rem;
     object-fit: contain;
     background: color-mix(in srgb, var(--bulletin-text) 6%, transparent);
-    border-inline-start: 1px solid var(--bulletin-divider);
 }
 
 .bulletin-image[hidden] {
@@ -175,10 +175,11 @@
 
     .bulletin-image {
         order: -1;
-        height: 10rem;
-        padding: .7rem;
+        width: calc(100% - 1.4rem);
+        height: 8.6rem;
+        margin: .7rem;
+        border-radius: .6rem;
         border-inline-start: 0;
-        border-bottom: 1px solid var(--bulletin-divider);
     }
 
     .bulletin-active {
