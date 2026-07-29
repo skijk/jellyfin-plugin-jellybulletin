@@ -497,6 +497,13 @@
                 return blocks;
             }
 
+            function syncEditorBlocks() {
+                const item = current();
+                if (item) {
+                    item.Blocks = serializeEditor();
+                }
+            }
+
             function createInline(run) {
                 let element = document.createElement('span');
                 element.textContent = value(run, 'Text', 'text') || '';
@@ -626,7 +633,6 @@
                 }
                 item.ImageUrl = imageUrl || null;
                 item.ImageAlt = page.querySelector('#BulletinImageAlt').value.trim() || null;
-                item.Blocks = serializeEditor();
                 item.IsPublished = page.querySelector('#BulletinPublished').checked;
                 item.IsPinned = page.querySelector('#BulletinPinned').checked;
                 if (item.IsPinned) {
@@ -709,6 +715,7 @@
                     document.execCommand(button.dataset.command, false, null);
                     page.querySelector('#BulletinEditor').focus();
                     rememberEditorSelection();
+                    syncEditorBlocks();
                     updateHomePreview();
                 });
             });
@@ -723,13 +730,17 @@
             });
             page.querySelector('#BulletinEditor').addEventListener('keyup', rememberEditorSelection);
             page.querySelector('#BulletinEditor').addEventListener('mouseup', rememberEditorSelection);
-            page.querySelector('#BulletinEditor').addEventListener('input', rememberEditorSelection);
+            page.querySelector('#BulletinEditor').addEventListener('input', () => {
+                rememberEditorSelection();
+                syncEditorBlocks();
+            });
             page.querySelector('#BulletinColor').addEventListener('mousedown', rememberEditorSelection);
             page.querySelector('#BulletinColor').addEventListener('input', event => {
                 restoreEditorSelection();
                 document.execCommand('styleWithCSS', false, false);
                 document.execCommand('foreColor', false, event.target.value);
                 rememberEditorSelection();
+                syncEditorBlocks();
                 updateHomePreview();
             });
             page.querySelector('#BulletinTitle').addEventListener('input', updateHomePreview);
@@ -795,6 +806,7 @@
                 if (url && /^https?:\/\//i.test(url)) {
                     document.execCommand('createLink', false, url);
                     rememberEditorSelection();
+                    syncEditorBlocks();
                 }
                 else if (url) Dashboard.alert('The link must start with http:// or https://.');
                 updateHomePreview();
@@ -823,6 +835,9 @@
             });
             page.querySelector('#BulletinApply').addEventListener('click', () => {
                 page.querySelector('#BulletinForm').requestSubmit();
+            });
+            page.querySelectorAll('#BulletinApply, #BulletinForm button[type="submit"]').forEach(button => {
+                button.addEventListener('mousedown', syncEditorBlocks);
             });
             page.querySelector('#BulletinDelete').addEventListener('click', () => {
                 if (!current() || !window.confirm('Delete this bulletin?')) return;

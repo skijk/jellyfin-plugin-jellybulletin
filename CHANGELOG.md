@@ -2,6 +2,12 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.12.0 — Public beta
+
+- Capture the structured rich-text model as editing and formatting occur.
+- Preserve the model before Save Bulletin moves focus away from the editor.
+- Avoid rebuilding saved content from a browser-normalized, blurred editor.
+
 ## 0.3.11.0 — Public beta
 
 - Preserve the editor selection when using formatting controls, colors and links.
