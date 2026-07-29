@@ -223,7 +223,7 @@
         .bulletin-preview-body p { margin:.3rem 0; }
         .bulletin-preview-body ul,.bulletin-preview-body ol { margin:.35rem 0; padding-inline-start:1.2rem; }
         .bulletin-preview-body a { color:var(--bulletin-accent); text-decoration:underline; text-underline-offset:.15em; }
-        .bulletin-home-image-preview { display:block; width:100%; height:100%; min-height:0; object-fit:contain; background:color-mix(in srgb,var(--bulletin-text) 6%,transparent); border-inline-start:1px solid var(--bulletin-divider); }
+        .bulletin-home-image-preview { box-sizing:border-box; display:block; width:100%; height:100%; min-height:0; padding:.55rem; object-fit:contain; background:color-mix(in srgb,var(--bulletin-text) 6%,transparent); border-inline-start:1px solid var(--bulletin-divider); }
         .bulletin-home-image-preview[hidden] { display:none; }
         .bulletin-preview-navigation { display:flex; align-items:center; justify-content:center; gap:.75rem; min-height:2.8rem; border-top:1px solid var(--bulletin-divider); }
         .bulletin-preview-navigation span { display:grid; place-items:center; width:2.15rem; height:2.15rem; border:1px solid var(--bulletin-divider); border-radius:50%; background:var(--bulletin-subtle); font-size:1.55rem; }
@@ -231,7 +231,7 @@
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
         .bulletin-schedule-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
         .bulletin-datetime-input { box-sizing:border-box; width:100%; min-height:2.8rem; padding:.55rem .7rem; border:1px solid var(--jf-palette-divider,rgba(255,255,255,.2)); border-radius:.25rem; background:var(--jf-palette-background-paper,rgba(255,255,255,.14)); color:inherit; }
-        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-home-image-preview { order:-1; height:10rem; border-inline-start:0; border-bottom:1px solid var(--bulletin-divider); } }
+        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-home-image-preview { order:-1; height:10rem; padding:.4rem; border-inline-start:0; border-bottom:1px solid var(--bulletin-divider); } }
         @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } .bulletin-schedule-grid { grid-template-columns:1fr; } }
     </style>
 

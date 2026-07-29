@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.6.0 — Public beta
+
+- Add balanced inner spacing around bulletin images.
+- Match the image spacing in the editor preview and responsive layout.
+
 ## 0.3.5.0 — Public beta
 
 - Automatically enable a bulletin when a publish time is configured.
