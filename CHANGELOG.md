@@ -2,6 +2,13 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.17.0
+
+- Use the full panel width in text-only mode.
+- Show two separate announcements at once in text-only mode on wide screens.
+- Keep one announcement at a time on mobile.
+- Reduce text-only panel height and whitespace.
+
 ## 0.3.16.0
 
 - Add a global **Show images on the home screen** setting.
