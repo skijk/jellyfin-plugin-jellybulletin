@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.19.0
+
+- Restore HTTP and HTTPS image URLs alongside locally uploaded images.
+- Supersede the overly restrictive image handling in 0.3.18.0.
+
 ## 0.3.18.0
 
 - Prevent browser Basic Auth prompts caused by protected external bulletin images.
