@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.9.0 — Public beta
+
+- Preserve Safari inline styles when serializing rich text.
+- Retain bold, italic, underline and color formatting after saving and reload.
+
 ## 0.3.8.0 — Public beta
 
 - Round the actual fitted image element instead of only its container.

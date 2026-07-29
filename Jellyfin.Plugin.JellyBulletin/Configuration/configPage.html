@@ -449,7 +449,16 @@
                 if (tag === 'u') next.Underline = true;
                 if (tag === 'a' && /^https?:\/\//i.test(node.href)) next.Href = node.href;
 
-                const color = node.style?.color;
+                const style = node.style;
+                const fontWeight = style?.fontWeight || '';
+                if (fontWeight === 'bold' || Number.parseInt(fontWeight, 10) >= 600) next.Bold = true;
+                if (style?.fontStyle === 'italic' || style?.fontStyle === 'oblique') next.Italic = true;
+                if ((style?.textDecoration || '').includes('underline')
+                    || (style?.textDecorationLine || '').includes('underline')) {
+                    next.Underline = true;
+                }
+
+                const color = style?.color || (tag === 'font' ? node.getAttribute('color') : null);
                 if (color) {
                     const context = document.createElement('canvas').getContext('2d');
                     context.fillStyle = color;
