@@ -26,6 +26,14 @@
     overflow: hidden;
 }
 
+.bulletin-height-compact .bulletin-feature {
+    height: clamp(13rem, 18vw, 16rem);
+}
+
+.bulletin-height-tall .bulletin-feature {
+    height: clamp(22rem, 32vw, 29rem);
+}
+
 .bulletin-feature.has-image {
     grid-template-columns: minmax(0, 1.25fr) minmax(18rem, .75fr);
 }
@@ -177,6 +185,14 @@
 
     .bulletin-feature {
         height: 27rem;
+    }
+
+    .bulletin-height-compact .bulletin-feature {
+        height: 21rem;
+    }
+
+    .bulletin-height-tall .bulletin-feature {
+        height: 34rem;
     }
 }
 

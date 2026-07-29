@@ -2,6 +2,12 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.14.0 — Public beta
+
+- Add Compact, Standard and Tall announcement panel heights.
+- Apply the selected height consistently to the carousel and live preview.
+- Preserve Standard as the default for existing installations.
+
 ## 0.3.13.0 — Public beta
 
 - Preserve bullet and numbered lists nested inside browser-generated wrappers.

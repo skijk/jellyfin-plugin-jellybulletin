@@ -22,6 +22,7 @@ control.
 - Optional uploaded, pasted, dropped or externally hosted images
 - Image alternative text for accessibility
 - Three to five recent announcements in a compact carousel
+- Compact, standard or tall announcement panel height
 - Configurable automatic rotation with an accessible pause/start control
 - Manual previous and next controls
 - Drag-and-drop ordering and one pinned top announcement
