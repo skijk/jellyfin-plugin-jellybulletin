@@ -475,25 +475,67 @@
 
             function serializeEditor() {
                 const blocks = [];
-                [...page.querySelector('#BulletinEditor').childNodes].forEach(node => {
-                    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-                        blocks.push({ Type: 'paragraph', Content: inlineFromNode(node), Items: [] });
+
+                function appendList(node, tag) {
+                    blocks.push({
+                        Type: tag === 'ul' ? 'bulletList' : 'numberedList',
+                        Content: [],
+                        Items: [...node.children]
+                            .filter(child => child.tagName.toLowerCase() === 'li')
+                            .map(child => inlineFromNode(child))
+                    });
+                }
+
+                function appendParagraph(nodes) {
+                    const content = nodes.flatMap(node => inlineFromNode(node));
+                    if (content.some(run => run.Text.length > 0)) {
+                        blocks.push({ Type: 'paragraph', Content: content, Items: [] });
+                    }
+                }
+
+                function appendBlock(node) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        if (node.textContent.trim()) appendParagraph([node]);
                         return;
                     }
                     if (node.nodeType !== Node.ELEMENT_NODE) return;
+
                     const tag = node.tagName.toLowerCase();
                     if (tag === 'ul' || tag === 'ol') {
-                        blocks.push({
-                            Type: tag === 'ul' ? 'bulletList' : 'numberedList',
-                            Content: [],
-                            Items: [...node.children]
-                                .filter(child => child.tagName.toLowerCase() === 'li')
-                                .map(child => inlineFromNode(child))
-                        });
+                        appendList(node, tag);
+                    } else if ([...node.children].some(child => {
+                        const childTag = child.tagName.toLowerCase();
+                        return childTag === 'div' || childTag === 'p'
+                            || childTag === 'ul' || childTag === 'ol';
+                    })) {
+                        appendContainer(node);
                     } else {
-                        blocks.push({ Type: 'paragraph', Content: inlineFromNode(node), Items: [] });
+                        appendParagraph([node]);
                     }
-                });
+                }
+
+                function appendContainer(container) {
+                    let inlineNodes = [];
+                    const flushInline = () => {
+                        appendParagraph(inlineNodes);
+                        inlineNodes = [];
+                    };
+
+                    [...container.childNodes].forEach(node => {
+                        const tag = node.nodeType === Node.ELEMENT_NODE
+                            ? node.tagName.toLowerCase()
+                            : '';
+                        if (tag === 'div' || tag === 'p' || tag === 'ul' || tag === 'ol') {
+                            flushInline();
+                            appendBlock(node);
+                        } else {
+                            inlineNodes.push(node);
+                        }
+                    });
+                    flushInline();
+                }
+
+                appendContainer(page.querySelector('#BulletinEditor'));
                 return blocks;
             }
 

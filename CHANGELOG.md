@@ -2,6 +2,12 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.13.0 — Public beta
+
+- Preserve bullet and numbered lists nested inside browser-generated wrappers.
+- Keep paragraph and list boundaries instead of flattening them into one text run.
+- Support the differing contenteditable DOM structures used by major browsers.
+
 ## 0.3.12.0 — Public beta
 
 - Capture the structured rich-text model as editing and formatting occur.
