@@ -2,7 +2,7 @@
 
 All notable changes to JellyBulletin are documented here.
 
-## 0.3.15.0 — Public beta
+## 0.3.16.0 — Public beta
 
 - You can now enable or disable image support. If disabled, 2 news till show in 1 card.
 
