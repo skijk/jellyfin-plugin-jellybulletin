@@ -2,9 +2,28 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.19.0 — Public beta
+
+- Restore HTTP and HTTPS image URLs alongside locally uploaded images.
+- Supersede the overly restrictive image handling in 0.3.18.0.
+
+## 0.3.18.0 — Public beta
+
+- Prevent browser Basic Auth prompts caused by protected external bulletin images.
+- Display only images uploaded to JellyBulletin's local image storage.
+- Keep image support without third-party authentication requests or tracking.
+
+## 0.3.17.0 — Public beta
+
+- Use the full panel width in text-only mode.
+- Show two separate announcements at once in text-only mode on wide screens.
+- Keep one announcement at a time on mobile.
+- Reduce text-only panel height and whitespace.
+
 ## 0.3.16.0 — Public beta
 
-- You can now enable or disable image support. If disabled, 2 news till show in 1 card.
+- Add a global **Show images on the home screen** setting.
+- Preserve uploaded artwork while using a lower text-focused layout when images are hidden.
 
 ## 0.3.15.0 — Public beta
 

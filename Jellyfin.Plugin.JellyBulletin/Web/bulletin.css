@@ -34,6 +34,27 @@
     height: clamp(22rem, 32vw, 29rem);
 }
 
+.bulletin-images-hidden .bulletin-feature {
+    height: clamp(10rem, 12vw, 12rem);
+}
+
+.bulletin-images-hidden .bulletin-active {
+    padding: clamp(.9rem, 1.7vw, 1.35rem) clamp(1.2rem, 3vw, 2.5rem);
+}
+
+.bulletin-images-hidden .bulletin-content {
+    max-width: none;
+    line-height: 1.5;
+}
+
+.bulletin-images-hidden .bulletin-feature.text-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bulletin-images-hidden .bulletin-secondary {
+    border-left: 1px solid var(--bulletin-divider);
+}
+
 .bulletin-feature.has-image {
     grid-template-columns: minmax(0, 1.25fr) minmax(18rem, .75fr);
 }
@@ -193,6 +214,18 @@
 
     .bulletin-height-tall .bulletin-feature {
         height: 34rem;
+    }
+
+    .bulletin-images-hidden .bulletin-feature {
+        height: clamp(12rem, 42vw, 16rem);
+    }
+
+    .bulletin-images-hidden .bulletin-feature.text-pair {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .bulletin-images-hidden .bulletin-secondary {
+        display: none;
     }
 }
 
