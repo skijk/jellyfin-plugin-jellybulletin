@@ -4,6 +4,10 @@ All notable changes to JellyBulletin are documented here.
 
 ## 0.3.15.0 — Public beta
 
+- You can now enable or disable image support. If disabled, 2 news till show in 1 card.
+
+## 0.3.15.0 — Public beta
+
 - Present the plugin logo on a centered 16:9 catalog canvas with safe spacing.
 
 ## 0.3.14.0 — Public beta
