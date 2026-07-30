@@ -2,6 +2,11 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.20.0
+
+- Publish the current text-only, compact two-item, and external image URL features as a stable release.
+- Clarify that File Transformation is required and JellySpotlight placement integration is optional.
+
 ## 0.3.19.0 — Public beta
 
 - Restore HTTP and HTTPS image URLs alongside locally uploaded images.
