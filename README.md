@@ -20,6 +20,7 @@ control.
 
 - Bold, italic, underline, text colors, links and ordered or unordered lists
 - Optional uploaded, pasted, dropped or externally hosted images
+- Optional text-only home-screen mode with two announcements on wide screens
 - Image alternative text for accessibility
 - Three to five recent announcements in a compact carousel
 - Compact, standard or tall announcement panel height
@@ -31,13 +32,18 @@ control.
 - Live layout preview and overflow warning in the editor
 - Automatic cleanup of uploaded images that are no longer referenced
 
-## Requirements
+## Dependencies
 
-- Jellyfin Server 10.11.11
-- Jellyfin Web or another web-based Jellyfin client
-- [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation)
+| Component | Status | Used for |
+| --- | --- | --- |
+| Jellyfin Server 10.11.11 | Required | Supported server and plugin ABI |
+| Jellyfin Web or a web-based Jellyfin client | Required client | Renders the injected home-screen component |
+| [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) | Required | Injects Bulletin into Jellyfin Web |
+| [JellySpotlight](https://github.com/skijk/jellyfin-plugin-jellyspotlight) | Optional | Coordinates whether Spotlight rows appear before or after Bulletin |
 
 Native clients that do not render Jellyfin Web are not currently supported.
+JellyBulletin does not require Jelana, Playback Reporting, Radarr Watch, Jellyfin
+Enhanced or JS Injector.
 
 ## Installation
 
@@ -57,6 +63,10 @@ Native clients that do not render Jellyfin Web are not currently supported.
 
 4. Install **JellyBulletin** and restart Jellyfin.
 5. Open **Dashboard → Plugins → Bulletin** to create announcements.
+
+JellyBulletin's stable catalog is `catalog-v2.json`. Development builds are
+published separately in `catalog-dev.json`; configure only the catalog you
+intend to follow.
 
 ## Updating
 
