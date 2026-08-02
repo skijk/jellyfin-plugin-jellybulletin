@@ -1,7 +1,7 @@
 ---
 name: "JellyBulletin"
 guid: "6ad77d9a-e157-4ca2-82e7-a114f86a5f50"
-version: "0.3.20.0"
+version: "0.3.21.0"
 targetAbi: "10.11.11.0"
 framework: "net9.0"
 overview: "Announcements for Jellyfin Web. Requires File Transformation."
@@ -14,4 +14,4 @@ owner: "SKYNET"
 artifacts:
 - "Jellyfin.Plugin.JellyBulletin.dll"
 - "logo.png"
-changelog: "Publish the current beta features as a stable release and clarify required and optional integrations."
+changelog: "Add adaptive panel sizing and per-bulletin prominent, compact, or hidden title styles."

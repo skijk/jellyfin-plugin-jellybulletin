@@ -2,6 +2,12 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.21.0 — Development
+
+- Add an Adaptive panel height that follows the displayed content.
+- Add Prominent, Compact and Hidden title styles per bulletin.
+- Keep titles available in administration and as accessible labels when hidden visually.
+
 ## 0.3.20.0
 
 - Publish the current text-only, compact two-item, and external image URL features as a stable release.

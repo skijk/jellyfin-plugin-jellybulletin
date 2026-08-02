@@ -90,7 +90,9 @@
 
         const autoRotate = Boolean(data.AutoRotate ?? data.autoRotate ?? true);
         const requestedPanelHeight = data.PanelHeight ?? data.panelHeight;
-        const panelHeight = requestedPanelHeight === 'compact' || requestedPanelHeight === 'tall'
+        const panelHeight = requestedPanelHeight === 'adaptive'
+            || requestedPanelHeight === 'compact'
+            || requestedPanelHeight === 'tall'
             ? requestedPanelHeight
             : 'standard';
         const showImages = Boolean(data.ShowImages ?? data.showImages ?? true);
@@ -118,11 +120,13 @@
         const title = document.createElement('h2');
         const date = document.createElement('time');
         const contentHost = document.createElement('div');
+        contentHost.className = 'bulletin-content-host';
         const secondaryBody = document.createElement('article');
         secondaryBody.className = 'bulletin-active bulletin-secondary';
         const secondaryTitle = document.createElement('h2');
         const secondaryDate = document.createElement('time');
         const secondaryContentHost = document.createElement('div');
+        secondaryContentHost.className = 'bulletin-content-host';
         const imageFrame = document.createElement('div');
         imageFrame.className = 'bulletin-image-frame';
         const image = document.createElement('img');
@@ -193,12 +197,12 @@
             feature.classList.toggle('text-pair', itemsPerPage === 2);
             void feature.offsetWidth;
             feature.classList.add(direction < 0 ? 'slide-from-left' : 'slide-from-right');
-            updateArticle(item, title, date, contentHost);
+            updateArticle(item, body, title, date, contentHost);
             const secondaryIndex = selectedIndex + 1;
             const secondaryItem = secondaryIndex < items.length ? items[secondaryIndex] : null;
             secondaryBody.hidden = itemsPerPage !== 2 || !secondaryItem;
             if (!secondaryBody.hidden) {
-                updateArticle(secondaryItem, secondaryTitle, secondaryDate, secondaryContentHost);
+                updateArticle(secondaryItem, secondaryBody, secondaryTitle, secondaryDate, secondaryContentHost);
             }
             const imageUrl = item.ImageUrl || item.imageUrl;
             if (showImages && validImageUrl(imageUrl)) {
@@ -222,8 +226,16 @@
             return !showImages && window.matchMedia('(min-width: 851px)').matches && items.length > 1 ? 2 : 1;
         }
 
-        function updateArticle(item, articleTitle, articleDate, articleContent) {
-            articleTitle.textContent = item.Title || item.title;
+        function updateArticle(item, article, articleTitle, articleDate, articleContent) {
+            const titleText = item.Title || item.title;
+            const requestedHeaderStyle = item.HeaderStyle || item.headerStyle;
+            const headerStyle = requestedHeaderStyle === 'compact' || requestedHeaderStyle === 'hidden'
+                ? requestedHeaderStyle
+                : 'prominent';
+            article.classList.remove('bulletin-header-prominent', 'bulletin-header-compact', 'bulletin-header-hidden');
+            article.classList.add(`bulletin-header-${headerStyle}`);
+            article.setAttribute('aria-label', titleText);
+            articleTitle.textContent = titleText;
             const published = item.PublishAt || item.publishAt || item.PublishedAt || item.publishedAt;
             articleDate.dateTime = published;
             articleDate.textContent = formattedDate(published, {

@@ -101,6 +101,8 @@ public sealed partial class BulletinStore
             throw new ArgumentException($"Titles must contain 1-{MaxTitleLength} characters.");
         }
 
+        item.HeaderStyle = NormalizeHeaderStyle(item.HeaderStyle);
+
         item.ImageUrl = string.IsNullOrWhiteSpace(item.ImageUrl) ? null : item.ImageUrl.Trim();
         if (item.ImageUrl is not null
             && !IsLocalImageUrl(item.ImageUrl)
@@ -195,6 +197,11 @@ public sealed partial class BulletinStore
 
     private static string NormalizePanelHeight(string? value)
     {
-        return value is "compact" or "tall" ? value : "standard";
+        return value is "adaptive" or "compact" or "tall" ? value : "standard";
+    }
+
+    private static string NormalizeHeaderStyle(string? value)
+    {
+        return value is "compact" or "hidden" ? value : "prominent";
     }
 }

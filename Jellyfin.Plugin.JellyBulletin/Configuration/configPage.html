@@ -20,6 +20,7 @@
                 <div class="selectContainer">
                     <label class="selectLabel" for="BulletinPanelHeight">Announcement panel height</label>
                     <select id="BulletinPanelHeight" is="emby-select" class="emby-select-withcolor emby-select">
+                        <option value="adaptive">Adaptive</option>
                         <option value="compact">Compact</option>
                         <option value="standard">Standard</option>
                         <option value="tall">Tall</option>
@@ -68,6 +69,16 @@
                         <div class="inputContainer">
                             <label class="inputLabel inputLabelUnfocused" for="BulletinTitle">Title</label>
                             <input id="BulletinTitle" is="emby-input" maxlength="160" required />
+                        </div>
+
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="BulletinHeaderStyle">Title appearance</label>
+                            <select id="BulletinHeaderStyle" is="emby-select" class="emby-select-withcolor emby-select">
+                                <option value="prominent">Prominent</option>
+                                <option value="compact">Compact</option>
+                                <option value="hidden">Hidden on the home screen</option>
+                            </select>
+                            <div class="fieldDescription">The title always remains visible in this administration page and is retained as an accessible label.</div>
                         </div>
 
                         <div class="inputContainer">
@@ -235,12 +246,19 @@
         .bulletin-preview-label h2 { margin:0; font-size:1rem; }
         .bulletin-preview-label span { opacity:.58; font-size:.8rem; }
         .bulletin-preview-feature { display:grid; grid-template-columns:minmax(0,1fr); width:100%; aspect-ratio:45 / 11; overflow:hidden; }
+        .bulletin-preview-feature.height-adaptive { aspect-ratio:auto; }
         .bulletin-preview-feature.height-compact { aspect-ratio:5 / 1; }
         .bulletin-preview-feature.height-tall { aspect-ratio:13 / 4; }
         .bulletin-preview-feature.has-image { grid-template-columns:minmax(0,1.25fr) minmax(15rem,.75fr); }
         .bulletin-preview-copy { min-width:0; overflow:hidden; padding:1rem 1.2rem; scrollbar-width:thin; }
         .bulletin-preview-copy h3 { margin:0 0 .15rem; font-size:1.25rem; line-height:1.15; }
         .bulletin-preview-copy time { display:block; margin-bottom:.55rem; opacity:.62; font-size:.62rem; }
+        .bulletin-preview-copy.header-compact { display:grid; grid-template-columns:minmax(0,1fr) auto; align-content:start; column-gap:.7rem; padding:.7rem 1rem; }
+        .bulletin-preview-copy.header-compact h3 { margin:0; font-size:.9rem; }
+        .bulletin-preview-copy.header-compact time { margin:0; align-self:center; }
+        .bulletin-preview-copy.header-compact .bulletin-preview-body { grid-column:1 / -1; }
+        .bulletin-preview-copy.header-hidden { padding:.65rem 1rem; }
+        .bulletin-preview-copy.header-hidden h3,.bulletin-preview-copy.header-hidden time { display:none; }
         .bulletin-preview-body { font-size:.72rem; line-height:1.5; }
         .bulletin-preview-body p { margin:.3rem 0; }
         .bulletin-preview-body ul,.bulletin-preview-body ol { margin:.35rem 0; padding-inline-start:1.2rem; }
@@ -248,13 +266,15 @@
         .bulletin-home-image-preview-frame { box-sizing:border-box; display:flex; align-items:center; justify-content:center; width:calc(100% - 1.1rem); height:calc(100% - 1.1rem); min-height:0; margin:.55rem; overflow:hidden; border-radius:.45rem; background:color-mix(in srgb,var(--bulletin-text) 6%,transparent); }
         .bulletin-home-image-preview-frame[hidden] { display:none; }
         .bulletin-home-image-preview { display:block; width:auto; height:auto; max-width:100%; max-height:100%; border-radius:.38rem; object-fit:contain; }
+        .bulletin-preview-feature.height-adaptive .bulletin-home-image-preview-frame { height:auto; min-height:7rem; align-self:stretch; }
+        .bulletin-preview-feature.height-adaptive .bulletin-home-image-preview { max-height:11rem; }
         .bulletin-preview-navigation { display:flex; align-items:center; justify-content:center; gap:.75rem; min-height:2.8rem; border-top:1px solid var(--bulletin-divider); }
         .bulletin-preview-navigation span { display:grid; place-items:center; width:2.15rem; height:2.15rem; border:1px solid var(--bulletin-divider); border-radius:50%; background:var(--bulletin-subtle); font-size:1.55rem; }
         .bulletin-preview-navigation small { min-width:3.5rem; opacity:.68; text-align:center; }
         .bulletin-editor-actions { display:flex; gap:.75rem; margin:1rem 0 2rem; }
         .bulletin-schedule-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
         .bulletin-datetime-input { box-sizing:border-box; width:100%; min-height:2.8rem; padding:.55rem .7rem; border:1px solid var(--jf-palette-divider,rgba(255,255,255,.2)); border-radius:.25rem; background:var(--jf-palette-background-paper,rgba(255,255,255,.14)); color:inherit; }
-        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-preview-feature.height-compact { height:21rem; } .bulletin-preview-feature.height-tall { height:34rem; } .bulletin-home-image-preview-frame { order:-1; width:calc(100% - .8rem); height:9.2rem; margin:.4rem; border-radius:.35rem; } .bulletin-home-image-preview { border-radius:.3rem; } }
+        @media(max-width:850px) { .bulletin-preview-feature.has-image { grid-template-columns:1fr; aspect-ratio:auto; height:27rem; } .bulletin-preview-feature.height-adaptive.has-image { height:auto; } .bulletin-preview-feature.height-compact { height:21rem; } .bulletin-preview-feature.height-tall { height:34rem; } .bulletin-home-image-preview-frame { order:-1; width:calc(100% - .8rem); height:9.2rem; margin:.4rem; border-radius:.35rem; } .bulletin-home-image-preview-frame[hidden] { display:none; } .bulletin-home-image-preview { border-radius:.3rem; } }
         @media(max-width:700px) { .bulletin-admin-layout { grid-template-columns:1fr; } .bulletin-preview-feature { aspect-ratio:auto; height:27rem; } .bulletin-preview-feature.height-compact { height:21rem; } .bulletin-preview-feature.height-tall { height:34rem; } .bulletin-preview-label { align-items:flex-start; flex-direction:column; gap:.15rem; } .bulletin-schedule-grid { grid-template-columns:1fr; } }
     </style>
 
@@ -300,7 +320,11 @@
                 /^https?:\/\//i.test(url || '')
                 || /^\/Bulletin\/Image\/[0-9a-f]{32}\.(png|jpg|webp)$/i.test(url || '');
             const normalizePanelHeight = height =>
-                height === 'compact' || height === 'tall' ? height : 'standard';
+                height === 'adaptive' || height === 'compact' || height === 'tall'
+                    ? height
+                    : 'standard';
+            const normalizeHeaderStyle = style =>
+                style === 'compact' || style === 'hidden' ? style : 'prominent';
 
             function normalizeInline(run) {
                 return {
@@ -326,6 +350,7 @@
                 return {
                     Id: String(value(item, 'Id', 'id') || '').replaceAll('-', '').toLowerCase(),
                     Title: value(item, 'Title', 'title') || '',
+                    HeaderStyle: normalizeHeaderStyle(value(item, 'HeaderStyle', 'headerStyle')),
                     ImageUrl: value(item, 'ImageUrl', 'imageUrl') || null,
                     ImageAlt: value(item, 'ImageAlt', 'imageAlt') || null,
                     Blocks: (value(item, 'Blocks', 'blocks') || []).map(normalizeBlock),
@@ -345,6 +370,7 @@
                     .map(item => ({
                         Id: item.Id,
                         Title: item.Title,
+                        HeaderStyle: item.HeaderStyle,
                         ImageUrl: item.ImageUrl,
                         ImageAlt: item.ImageAlt,
                         Blocks: item.Blocks,
@@ -373,7 +399,13 @@
             function updateHomePreview() {
                 const item = current();
                 const title = page.querySelector('#BulletinTitle').value.trim();
-                page.querySelector('#BulletinPreviewTitle').textContent = title || 'Untitled bulletin';
+                const previewCopy = page.querySelector('.bulletin-preview-copy');
+                const headerStyle = normalizeHeaderStyle(page.querySelector('#BulletinHeaderStyle').value);
+                const previewTitle = page.querySelector('#BulletinPreviewTitle');
+                previewTitle.textContent = title || 'Untitled bulletin';
+                previewCopy.setAttribute('aria-label', title || 'Untitled bulletin');
+                previewCopy.classList.remove('header-prominent', 'header-compact', 'header-hidden');
+                previewCopy.classList.add(`header-${headerStyle}`);
                 const published = value(item, 'PublishAt', 'publishAt')
                     || value(item, 'PublishedAt', 'publishedAt')
                     || new Date().toISOString();
@@ -389,7 +421,7 @@
                 const previewFeature = page.querySelector('#BulletinPreviewFeature');
                 const panelHeight = normalizePanelHeight(
                     page.querySelector('#BulletinPanelHeight').value);
-                previewFeature.classList.remove('height-compact', 'height-standard', 'height-tall');
+                previewFeature.classList.remove('height-adaptive', 'height-compact', 'height-standard', 'height-tall');
                 previewFeature.classList.add(`height-${panelHeight}`);
                 const previewBody = page.querySelector('#BulletinPreviewBody');
                 previewBody.replaceChildren(...[...editor.childNodes].map(node => node.cloneNode(true)));
@@ -594,6 +626,8 @@
                 page.querySelector('#BulletinEditorPanel').hidden = !item;
                 if (!item) return;
                 page.querySelector('#BulletinTitle').value = value(item, 'Title', 'title') || '';
+                page.querySelector('#BulletinHeaderStyle').value = normalizeHeaderStyle(
+                    value(item, 'HeaderStyle', 'headerStyle'));
                 const imageUrl = value(item, 'ImageUrl', 'imageUrl') || '';
                 page.querySelector('#BulletinImageUrl').value = imageUrl;
                 showImagePreview(imageUrl);
@@ -694,6 +728,7 @@
                     return false;
                 }
                 item.Title = title;
+                item.HeaderStyle = normalizeHeaderStyle(page.querySelector('#BulletinHeaderStyle').value);
                 const imageUrl = page.querySelector('#BulletinImageUrl').value.trim();
                 if (imageUrl && !validImageUrl(imageUrl)) {
                     Dashboard.alert('Use an uploaded image or a URL that starts with http:// or https://.');
@@ -816,6 +851,7 @@
                 updateHomePreview();
             });
             page.querySelector('#BulletinTitle').addEventListener('input', updateHomePreview);
+            page.querySelector('#BulletinHeaderStyle').addEventListener('change', updateHomePreview);
             page.querySelector('#BulletinPanelHeight').addEventListener('change', updateHomePreview);
             page.querySelector('#BulletinShowImages').addEventListener('change', updateHomePreview);
             page.querySelector('#BulletinImageAlt').addEventListener('input', updateHomePreview);
@@ -890,6 +926,7 @@
                 const item = {
                     Id: id,
                     Title: '',
+                    HeaderStyle: 'prominent',
                     ImageUrl: null,
                     ImageAlt: null,
                     Blocks: [{ Type: 'paragraph', Content: [], Items: [] }],

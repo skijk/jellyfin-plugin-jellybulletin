@@ -9,6 +9,8 @@ public sealed class BulletinItem
 
     public string Title { get; set; } = string.Empty;
 
+    public string HeaderStyle { get; set; } = "prominent";
+
     public string? ImageUrl { get; set; }
 
     public string? ImageAlt { get; set; }
