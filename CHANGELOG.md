@@ -2,6 +2,59 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.21.0 — Public beta
+
+- Add an **Adaptive** panel height that follows the displayed content, allowing
+  short notices to use a much lower banner while longer bulletins expand.
+- Keep images bounded and preserve internal scrolling when adaptive content
+  reaches the viewport-aware maximum height.
+- Add **Prominent**, **Compact** and **Hidden on home screen** title styles per
+  bulletin.
+- Keep hidden titles available in administration and expose them as accessible
+  labels on the home screen.
+- Update the live preview immediately when panel height or title appearance is
+  changed.
+- Preserve the previous appearance during upgrades: existing installations
+  remain Standard height and existing bulletins remain Prominent.
+
+## 0.3.20.0
+
+- Publish the current text-only, compact two-item, and external image URL features as a stable release.
+- Clarify that File Transformation is required and JellySpotlight placement integration is optional.
+
+## 0.3.19.0 — Public beta
+
+- Restore HTTP and HTTPS image URLs alongside locally uploaded images.
+- Supersede the overly restrictive image handling in 0.3.18.0.
+
+## 0.3.18.0 — Public beta
+
+- Prevent browser Basic Auth prompts caused by protected external bulletin images.
+- Display only images uploaded to JellyBulletin's local image storage.
+- Keep image support without third-party authentication requests or tracking.
+
+## 0.3.17.0 — Public beta
+
+- Use the full panel width in text-only mode.
+- Show two separate announcements at once in text-only mode on wide screens.
+- Keep one announcement at a time on mobile.
+- Reduce text-only panel height and whitespace.
+
+## 0.3.16.0 — Public beta
+
+- Add a global **Show images on the home screen** setting.
+- Preserve uploaded artwork while using a lower text-focused layout when images are hidden.
+
+## 0.3.15.0 — Public beta
+
+- Present the plugin logo on a centered 16:9 catalog canvas with safe spacing.
+
+## 0.3.14.0 — Public beta
+
+- Add Compact, Standard and Tall announcement panel heights.
+- Apply the selected height consistently to the carousel and live preview.
+- Preserve Standard as the default for existing installations.
+
 ## 0.3.13.0 — Public beta
 
 - Preserve bullet and numbered lists nested inside browser-generated wrappers.

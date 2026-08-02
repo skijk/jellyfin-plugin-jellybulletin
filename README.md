@@ -20,8 +20,11 @@ control.
 
 - Bold, italic, underline, text colors, links and ordered or unordered lists
 - Optional uploaded, pasted, dropped or externally hosted images
+- Optional text-only home-screen mode with two announcements on wide screens
 - Image alternative text for accessibility
 - Three to five recent announcements in a compact carousel
+- Adaptive, compact, standard or tall announcement panel height
+- Prominent, compact or visually hidden titles per bulletin
 - Configurable automatic rotation with an accessible pause/start control
 - Manual previous and next controls
 - Drag-and-drop ordering and one pinned top announcement
@@ -30,13 +33,18 @@ control.
 - Live layout preview and overflow warning in the editor
 - Automatic cleanup of uploaded images that are no longer referenced
 
-## Requirements
+## Dependencies
 
-- Jellyfin Server 10.11.11
-- Jellyfin Web or another web-based Jellyfin client
-- [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation)
+| Component | Status | Used for |
+| --- | --- | --- |
+| Jellyfin Server 10.11.11 | Required | Supported server and plugin ABI |
+| Jellyfin Web or a web-based Jellyfin client | Required client | Renders the injected home-screen component |
+| [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) | Required | Injects Bulletin into Jellyfin Web |
+| [JellySpotlight](https://github.com/skijk/jellyfin-plugin-jellyspotlight) | Optional | Coordinates whether Spotlight rows appear before or after Bulletin |
 
 Native clients that do not render Jellyfin Web are not currently supported.
+JellyBulletin does not require Jelana, Playback Reporting, Radarr Watch, Jellyfin
+Enhanced or JS Injector.
 
 ## Installation
 
@@ -56,6 +64,34 @@ Native clients that do not render Jellyfin Web are not currently supported.
 
 4. Install **JellyBulletin** and restart Jellyfin.
 5. Open **Dashboard → Plugins → Bulletin** to create announcements.
+
+JellyBulletin's stable catalog is `catalog-v2.json`. Development builds are
+published separately in `catalog-dev.json`; configure only the catalog you
+intend to follow.
+
+## Layout controls
+
+The announcement panel height is configured globally under **Dashboard →
+Plugins → Bulletin**:
+
+- **Adaptive** follows the currently displayed content. Short notices use a
+  low banner while longer text or an image is given more room.
+- **Compact** keeps every bulletin in a low, fixed-height panel.
+- **Standard** is the balanced fixed-height layout and remains the default for
+  existing installations.
+- **Tall** provides the largest fixed-height panel for detailed announcements.
+
+Each bulletin also has its own **Title appearance** setting:
+
+- **Prominent** uses the original large heading with the date below it.
+- **Compact** uses a smaller heading and places the date on the same line.
+- **Hidden on home screen** removes the visible heading and date from the home
+  screen. The title remains required, stays visible in administration and is
+  retained as an accessible label.
+
+For a short, low-profile notice, combine **Adaptive** with a **Compact** or
+**Hidden on home screen** title. Existing bulletins remain **Prominent** until
+changed. The live preview reflects both settings before saving.
 
 ## Updating
 
@@ -80,7 +116,9 @@ directory if you intend to reinstall and retain existing content.
 - All published announcements are visible to all authenticated users.
 - Scheduling uses the Jellyfin server clock.
 - External image URLs remain dependent on the external host.
-- Long content scrolls inside the fixed-height announcement panel.
+- Long content scrolls inside Compact, Standard and Tall panels. Adaptive
+  panels grow with their content up to a viewport-aware maximum and then
+  scroll.
 - File Transformation modifies Jellyfin Web during startup and is a required
   runtime dependency.
 
@@ -99,6 +137,9 @@ node scripts/validate-assets.mjs
 ```
 
 The project targets .NET 9 and builds against Jellyfin 10.11.11.
+
+Development builds and their test checklist are documented in
+[Development builds](docs/DEVELOPMENT.md).
 
 ## AI assistance disclosure
 

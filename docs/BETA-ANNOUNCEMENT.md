@@ -1,12 +1,8 @@
 # JellyBulletin Public Beta
 
-## Jellyfin Forum
-
-### Title
 
 JellyBulletin — rich announcements on the Jellyfin home screen (public beta)
 
-### Post
 
 JellyBulletin is a new public-beta plugin for Jellyfin Web that lets server
 administrators publish announcements directly on the home screen.
@@ -18,11 +14,19 @@ It currently supports:
 - Bullet and numbered lists
 - Uploaded, pasted, dropped or externally hosted images
 - Three to five announcements in a carousel
+- Adaptive, compact, standard and tall panel heights
+- Prominent, compact or visually hidden titles per announcement
 - Automatic rotation, manual navigation and pause
 - Pinned announcements
 - Scheduled publishing and unpublishing
 - Theme-aware presentation
 - A live layout preview in the administration page
+
+New in 0.3.21, the announcement panel can follow its content automatically.
+Short notices can therefore appear as a low-profile banner, while longer
+announcements expand when needed. Each announcement can independently use a
+prominent title, a compact title or hide the title visually on the home screen.
+Hidden titles remain available to assistive technology and in administration.
 
 ![JellyBulletin beta announcement](images/jellybulletin-home-beta.png)
 
@@ -59,40 +63,3 @@ https://github.com/skijk/jellyfin-plugin-jellybulletin
 This is a public beta. Feedback and reproducible bug reports are very welcome.
 Please include the Jellyfin version, browser/client, JellyBulletin version,
 File Transformation version and relevant Jellyfin logs.
-
-## Reddit
-
-### Title
-
-[Plugin] JellyBulletin public beta — rich announcements on the Jellyfin home screen
-
-### Post
-
-**AI disclosure:** JellyBulletin was developed with extensive assistance from
-OpenAI Codex. I directed the product design, requirements and testing, while
-Codex assisted with implementation, review, packaging and documentation. The
-plugin has been tested on my own Jellyfin server, and the use of AI assistance
-is also documented in the project README.
-
-I have released the public beta of JellyBulletin, a plugin for publishing
-server news, maintenance notices and other announcements directly on the
-Jellyfin home screen.
-
-Features include rich text, links, lists, images, scheduling, pinning and an
-automatic announcement carousel. The presentation follows the active Jellyfin
-theme and every published announcement is visible to all authenticated users.
-
-It is currently tested with Jellyfin 10.11.11 and targets Jellyfin Web and
-web-based clients. File Transformation is required.
-
-Project and instructions:
-
-https://github.com/skijk/jellyfin-plugin-jellybulletin
-
-Plugin repository:
-
-```text
-https://raw.githubusercontent.com/skijk/jellyfin-plugin-jellybulletin-repository/main/catalog-v2.json
-```
-
-This is beta software, so feedback and bug reports are appreciated.

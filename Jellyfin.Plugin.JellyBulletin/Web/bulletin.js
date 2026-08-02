@@ -89,9 +89,16 @@
         if (!home) return;
 
         const autoRotate = Boolean(data.AutoRotate ?? data.autoRotate ?? true);
+        const requestedPanelHeight = data.PanelHeight ?? data.panelHeight;
+        const panelHeight = requestedPanelHeight === 'adaptive'
+            || requestedPanelHeight === 'compact'
+            || requestedPanelHeight === 'tall'
+            ? requestedPanelHeight
+            : 'standard';
+        const showImages = Boolean(data.ShowImages ?? data.showImages ?? true);
         const rotationSeconds = Math.max(5, Math.min(30,
             Number(data.RotationIntervalSeconds ?? data.rotationIntervalSeconds ?? 9)));
-        const signature = JSON.stringify({ items, autoRotate, rotationSeconds });
+        const signature = JSON.stringify({ items, autoRotate, rotationSeconds, panelHeight, showImages });
         const existing = document.getElementById(ROOT_ID);
         if (signature === lastSignature && existing) {
             if (existing.parentElement !== home) home.prepend(existing);
@@ -101,7 +108,8 @@
 
         const root = document.createElement('section');
         root.id = ROOT_ID;
-        root.className = 'jellyfin-bulletin';
+        root.className = `jellyfin-bulletin bulletin-height-${panelHeight}`;
+        root.classList.toggle('bulletin-images-hidden', !showImages);
         root.setAttribute('aria-label', 'News');
 
         const feature = document.createElement('div');
@@ -112,6 +120,13 @@
         const title = document.createElement('h2');
         const date = document.createElement('time');
         const contentHost = document.createElement('div');
+        contentHost.className = 'bulletin-content-host';
+        const secondaryBody = document.createElement('article');
+        secondaryBody.className = 'bulletin-active bulletin-secondary';
+        const secondaryTitle = document.createElement('h2');
+        const secondaryDate = document.createElement('time');
+        const secondaryContentHost = document.createElement('div');
+        secondaryContentHost.className = 'bulletin-content-host';
         const imageFrame = document.createElement('div');
         imageFrame.className = 'bulletin-image-frame';
         const image = document.createElement('img');
@@ -121,7 +136,8 @@
         imageFrame.append(image);
 
         body.append(title, date, contentHost);
-        feature.append(body, imageFrame);
+        secondaryBody.append(secondaryTitle, secondaryDate, secondaryContentHost);
+        feature.append(body, secondaryBody, imageFrame);
         root.append(feature);
 
         const navigation = document.createElement('div');
@@ -166,27 +182,30 @@
             clearInterval(rotationTimer);
             if (!autoRotate || items.length < 2 || interactionPaused || manuallyPaused || document.hidden) return;
             rotationTimer = setInterval(() => {
-                select((selectedIndex + 1) % items.length, selectedIndex + 1 >= items.length ? -1 : 1);
+                const nextIndex = selectedIndex + pageSize();
+                select(nextIndex % items.length, nextIndex >= items.length ? -1 : 1);
             }, rotationSeconds * 1000);
         }
 
         function select(index, direction = 1, restart = false) {
             selectedIndex = (index + items.length) % items.length;
             const item = items[selectedIndex];
+            const itemsPerPage = !showImages
+                && window.matchMedia('(min-width: 851px)').matches
+                && items.length > 1 ? 2 : 1;
             feature.classList.remove('slide-from-left', 'slide-from-right');
+            feature.classList.toggle('text-pair', itemsPerPage === 2);
             void feature.offsetWidth;
             feature.classList.add(direction < 0 ? 'slide-from-left' : 'slide-from-right');
-            title.textContent = item.Title || item.title;
-            const published = item.PublishAt || item.publishAt || item.PublishedAt || item.publishedAt;
-            date.dateTime = published;
-            date.textContent = formattedDate(published, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            contentHost.replaceChildren(createContent(item));
+            updateArticle(item, body, title, date, contentHost);
+            const secondaryIndex = selectedIndex + 1;
+            const secondaryItem = secondaryIndex < items.length ? items[secondaryIndex] : null;
+            secondaryBody.hidden = itemsPerPage !== 2 || !secondaryItem;
+            if (!secondaryBody.hidden) {
+                updateArticle(secondaryItem, secondaryBody, secondaryTitle, secondaryDate, secondaryContentHost);
+            }
             const imageUrl = item.ImageUrl || item.imageUrl;
-            if (validImageUrl(imageUrl)) {
+            if (showImages && validImageUrl(imageUrl)) {
                 image.src = imageUrl;
                 image.alt = item.ImageAlt || item.imageAlt || '';
                 imageFrame.hidden = false;
@@ -197,12 +216,38 @@
                 imageFrame.hidden = true;
                 feature.classList.remove('has-image');
             }
-            position.textContent = `${selectedIndex + 1} of ${items.length}`;
+            position.textContent = itemsPerPage === 2 && secondaryItem
+                ? `${selectedIndex + 1}–${secondaryIndex + 1} of ${items.length}`
+                : `${selectedIndex + 1} of ${items.length}`;
             if (restart) restartRotation();
         }
 
-        previous.addEventListener('click', () => select(selectedIndex - 1, -1, true));
-        next.addEventListener('click', () => select(selectedIndex + 1, 1, true));
+        function pageSize() {
+            return !showImages && window.matchMedia('(min-width: 851px)').matches && items.length > 1 ? 2 : 1;
+        }
+
+        function updateArticle(item, article, articleTitle, articleDate, articleContent) {
+            const titleText = item.Title || item.title;
+            const requestedHeaderStyle = item.HeaderStyle || item.headerStyle;
+            const headerStyle = requestedHeaderStyle === 'compact' || requestedHeaderStyle === 'hidden'
+                ? requestedHeaderStyle
+                : 'prominent';
+            article.classList.remove('bulletin-header-prominent', 'bulletin-header-compact', 'bulletin-header-hidden');
+            article.classList.add(`bulletin-header-${headerStyle}`);
+            article.setAttribute('aria-label', titleText);
+            articleTitle.textContent = titleText;
+            const published = item.PublishAt || item.publishAt || item.PublishedAt || item.publishedAt;
+            articleDate.dateTime = published;
+            articleDate.textContent = formattedDate(published, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            articleContent.replaceChildren(createContent(item));
+        }
+
+        previous.addEventListener('click', () => select(selectedIndex - pageSize(), -1, true));
+        next.addEventListener('click', () => select(selectedIndex + pageSize(), 1, true));
         pause.addEventListener('click', () => {
             manuallyPaused = !manuallyPaused;
             updatePauseButton();

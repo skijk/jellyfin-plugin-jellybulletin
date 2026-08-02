@@ -37,6 +37,8 @@ public sealed partial class BulletinStore
         return new BulletinResponse
         {
             VisibleItemCount = Math.Clamp(configuration.VisibleItemCount, 3, 5),
+            PanelHeight = NormalizePanelHeight(configuration.PanelHeight),
+            ShowImages = configuration.ShowImages,
             AutoRotate = configuration.AutoRotate,
             RotationIntervalSeconds = Math.Clamp(configuration.RotationIntervalSeconds, 5, 30),
             Items = items
@@ -48,6 +50,8 @@ public sealed partial class BulletinStore
         return new SaveBulletinsRequest
         {
             VisibleItemCount = Math.Clamp(Plugin.Instance.Configuration.VisibleItemCount, 3, 5),
+            PanelHeight = NormalizePanelHeight(Plugin.Instance.Configuration.PanelHeight),
+            ShowImages = Plugin.Instance.Configuration.ShowImages,
             AutoRotate = Plugin.Instance.Configuration.AutoRotate,
             RotationIntervalSeconds = Math.Clamp(Plugin.Instance.Configuration.RotationIntervalSeconds, 5, 30),
             Items = ReadItems()
@@ -80,6 +84,8 @@ public sealed partial class BulletinStore
 
         var configuration = Plugin.Instance.Configuration;
         configuration.VisibleItemCount = Math.Clamp(request.VisibleItemCount, 3, 5);
+        configuration.PanelHeight = NormalizePanelHeight(request.PanelHeight);
+        configuration.ShowImages = request.ShowImages;
         configuration.AutoRotate = request.AutoRotate;
         configuration.RotationIntervalSeconds = Math.Clamp(request.RotationIntervalSeconds, 5, 30);
         configuration.NewsJson = JsonConvert.SerializeObject(request.Items);
@@ -94,6 +100,8 @@ public sealed partial class BulletinStore
         {
             throw new ArgumentException($"Titles must contain 1-{MaxTitleLength} characters.");
         }
+
+        item.HeaderStyle = NormalizeHeaderStyle(item.HeaderStyle);
 
         item.ImageUrl = string.IsNullOrWhiteSpace(item.ImageUrl) ? null : item.ImageUrl.Trim();
         if (item.ImageUrl is not null
@@ -185,5 +193,15 @@ public sealed partial class BulletinStore
         return Path.GetFileName(fileName) == fileName
             && Guid.TryParseExact(Path.GetFileNameWithoutExtension(fileName), "N", out _)
             && extension is ".png" or ".jpg" or ".webp";
+    }
+
+    private static string NormalizePanelHeight(string? value)
+    {
+        return value is "adaptive" or "compact" or "tall" ? value : "standard";
+    }
+
+    private static string NormalizeHeaderStyle(string? value)
+    {
+        return value is "compact" or "hidden" ? value : "prominent";
     }
 }

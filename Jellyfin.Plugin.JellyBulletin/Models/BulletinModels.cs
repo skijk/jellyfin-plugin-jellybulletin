@@ -9,6 +9,8 @@ public sealed class BulletinItem
 
     public string Title { get; set; } = string.Empty;
 
+    public string HeaderStyle { get; set; } = "prominent";
+
     public string? ImageUrl { get; set; }
 
     public string? ImageAlt { get; set; }
@@ -67,6 +69,10 @@ public sealed class SaveBulletinsRequest
 {
     public int VisibleItemCount { get; set; } = 5;
 
+    public string PanelHeight { get; set; } = "standard";
+
+    public bool ShowImages { get; set; } = true;
+
     public bool AutoRotate { get; set; } = true;
 
     public int RotationIntervalSeconds { get; set; } = 9;
@@ -80,6 +86,10 @@ public sealed class SaveBulletinsRequest
 public sealed class BulletinResponse
 {
     public int VisibleItemCount { get; set; }
+
+    public string PanelHeight { get; set; } = "standard";
+
+    public bool ShowImages { get; set; }
 
     public bool AutoRotate { get; set; }
 
