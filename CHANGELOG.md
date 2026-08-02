@@ -2,11 +2,20 @@
 
 All notable changes to JellyBulletin are documented here.
 
-## 0.3.21.0 — Development
+## 0.3.21.0 — Public beta
 
-- Add an Adaptive panel height that follows the displayed content.
-- Add Prominent, Compact and Hidden title styles per bulletin.
-- Keep titles available in administration and as accessible labels when hidden visually.
+- Add an **Adaptive** panel height that follows the displayed content, allowing
+  short notices to use a much lower banner while longer bulletins expand.
+- Keep images bounded and preserve internal scrolling when adaptive content
+  reaches the viewport-aware maximum height.
+- Add **Prominent**, **Compact** and **Hidden on home screen** title styles per
+  bulletin.
+- Keep hidden titles available in administration and expose them as accessible
+  labels on the home screen.
+- Update the live preview immediately when panel height or title appearance is
+  changed.
+- Preserve the previous appearance during upgrades: existing installations
+  remain Standard height and existing bulletins remain Prominent.
 
 ## 0.3.20.0
 

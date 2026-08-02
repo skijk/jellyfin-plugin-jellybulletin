@@ -14,11 +14,19 @@ It currently supports:
 - Bullet and numbered lists
 - Uploaded, pasted, dropped or externally hosted images
 - Three to five announcements in a carousel
+- Adaptive, compact, standard and tall panel heights
+- Prominent, compact or visually hidden titles per announcement
 - Automatic rotation, manual navigation and pause
 - Pinned announcements
 - Scheduled publishing and unpublishing
 - Theme-aware presentation
 - A live layout preview in the administration page
+
+New in 0.3.21, the announcement panel can follow its content automatically.
+Short notices can therefore appear as a low-profile banner, while longer
+announcements expand when needed. Each announcement can independently use a
+prominent title, a compact title or hide the title visually on the home screen.
+Hidden titles remain available to assistive technology and in administration.
 
 ![JellyBulletin beta announcement](images/jellybulletin-home-beta.png)
 
@@ -55,4 +63,3 @@ https://github.com/skijk/jellyfin-plugin-jellybulletin
 This is a public beta. Feedback and reproducible bug reports are very welcome.
 Please include the Jellyfin version, browser/client, JellyBulletin version,
 File Transformation version and relevant Jellyfin logs.
-
