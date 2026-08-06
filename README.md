@@ -93,6 +93,34 @@ For a short, low-profile notice, combine **Adaptive** with a **Compact** or
 **Hidden on home screen** title. Existing bulletins remain **Prominent** until
 changed. The live preview reflects both settings before saving.
 
+## Theme and custom CSS integration
+
+JellyBulletin follows Jellyfin's active palette for its surface, text, accent,
+dividers, controls and shadow. This applies to the home-screen panel, the
+administration editor and its live preview. Themes that provide Jellyfin's
+`--jf-palette-*` variables work automatically.
+
+Custom CSS themes can override individual Bulletin values globally or only on
+the home-screen component:
+
+```css
+:root {
+  --bulletin-accent: #9b7cff;
+  --bulletin-surface: rgba(20, 20, 28, 0.92);
+  --bulletin-text: #f7f5ff;
+  --bulletin-muted: #b8b3c7;
+  --bulletin-divider: rgba(255, 255, 255, 0.14);
+  --bulletin-subtle: rgba(255, 255, 255, 0.07);
+  --bulletin-tint: rgba(155, 124, 255, 0.16);
+  --bulletin-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.3);
+  --bulletin-warning: #f0a000;
+}
+```
+
+All overrides are optional. Setting them on `.jellyfin-bulletin` limits the
+change to the home screen; setting them on `:root` also lets the Bulletin
+administration page and preview inherit the same palette.
+
 ## Updating
 
 Refresh the plugin catalog, install the offered JellyBulletin update and

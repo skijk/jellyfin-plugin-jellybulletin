@@ -2,6 +2,14 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.3.22.0 — Development
+
+- Follow Jellyfin palette variables for the home-screen panel, editor controls
+  and live preview, including light and custom CSS themes.
+- Remove dark-theme-only borders and backgrounds from the administration page.
+- Add inherited `--bulletin-*` CSS hooks so theme authors can explicitly style
+  Bulletin without replacing its component CSS.
+
 ## 0.3.21.0 — Public beta
 
 - Add an **Adaptive** panel height that follows the displayed content, allowing
