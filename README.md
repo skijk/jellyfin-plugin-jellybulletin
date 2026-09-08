@@ -8,8 +8,9 @@
 
 ![JellyBulletin beta announcement on the Jellyfin home screen](docs/images/jellybulletin-home-beta.png)
 
-> Public beta. JellyBulletin is tested against Jellyfin 12.0 and currently
-> targets Jellyfin Web and web-based clients.
+> Version 0.4.0.0 and later require Jellyfin 12.0 and File Transformation 3.0.
+> Jellyfin 10.11 installations must use the retained 0.3.x releases.
+> JellyBulletin currently targets Jellyfin Web and web-based clients.
 
 JellyBulletin gives server administrators a rich-text editor for publishing
 news, maintenance notices and other announcements. Every published bulletin is
@@ -39,7 +40,7 @@ control.
 | --- | --- | --- |
 | Jellyfin Server 12.0 | Required | Supported server and plugin ABI |
 | Jellyfin Web or a web-based Jellyfin client | Required client | Renders the injected home-screen component |
-| [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) | Required | Injects Bulletin into Jellyfin Web |
+| [File Transformation 3.0](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) | Required | Injects Bulletin into Jellyfin Web |
 | [JellySpotlight](https://github.com/skijk/jellyfin-plugin-jellyspotlight) | Optional | Coordinates whether Spotlight rows appear before or after Bulletin |
 
 Native clients that do not render Jellyfin Web are not currently supported.
