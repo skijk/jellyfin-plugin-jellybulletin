@@ -8,7 +8,7 @@
 
 ![JellyBulletin beta announcement on the Jellyfin home screen](docs/images/jellybulletin-home-beta.png)
 
-> Public beta. JellyBulletin is tested against Jellyfin 10.11.11 and currently
+> Public beta. JellyBulletin is tested against Jellyfin 12.0 and currently
 > targets Jellyfin Web and web-based clients.
 
 JellyBulletin gives server administrators a rich-text editor for publishing
@@ -37,7 +37,7 @@ control.
 
 | Component | Status | Used for |
 | --- | --- | --- |
-| Jellyfin Server 10.11.11 | Required | Supported server and plugin ABI |
+| Jellyfin Server 12.0 | Required | Supported server and plugin ABI |
 | Jellyfin Web or a web-based Jellyfin client | Required client | Renders the injected home-screen component |
 | [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) | Required | Injects Bulletin into Jellyfin Web |
 | [JellySpotlight](https://github.com/skijk/jellyfin-plugin-jellyspotlight) | Optional | Coordinates whether Spotlight rows appear before or after Bulletin |
@@ -139,7 +139,7 @@ directory if you intend to reinstall and retain existing content.
 
 ## Known limitations
 
-- Only Jellyfin 10.11.11 is currently tested.
+- Only Jellyfin 12.0 is currently tested.
 - Support is limited to Jellyfin Web and web-based clients.
 - All published announcements are visible to all authenticated users.
 - Scheduling uses the Jellyfin server clock.
@@ -164,7 +164,7 @@ dotnet build JellyBulletin.sln --configuration Release
 node scripts/validate-assets.mjs
 ```
 
-The project targets .NET 9 and builds against Jellyfin 10.11.11.
+The project targets .NET 10 and builds against Jellyfin 12.0.
 
 Development builds and their test checklist are documented in
 [Development builds](docs/DEVELOPMENT.md).

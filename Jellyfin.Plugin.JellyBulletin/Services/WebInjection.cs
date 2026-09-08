@@ -27,8 +27,8 @@ public static partial class WebInjection
         }
 
         const string assets = """
-            <link data-jellyfin-bulletin rel="stylesheet" href="/Bulletin/Client.css">
-            <script data-jellyfin-bulletin defer src="/Bulletin/Client.js"></script>
+            <link data-jellyfin-bulletin rel="stylesheet" href="/Bulletin/Client.css?v=0.4.0.0">
+            <script data-jellyfin-bulletin defer src="/Bulletin/Client.js?v=0.4.0.0"></script>
             """;
 
         var transformed = HeadEndRegex().Replace(source, $"{assets}</head>", 1);
