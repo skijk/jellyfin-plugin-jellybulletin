@@ -8,8 +8,9 @@
 
 ![JellyBulletin beta announcement on the Jellyfin home screen](docs/images/jellybulletin-home-beta.png)
 
-> Public beta. JellyBulletin is tested against Jellyfin 10.11.11 and currently
-> targets Jellyfin Web and web-based clients.
+> Version 0.4.0.0 and later require Jellyfin 12.0 and File Transformation 3.0.
+> Jellyfin 10.11 installations must use the retained 0.3.x releases.
+> JellyBulletin currently targets Jellyfin Web and web-based clients.
 
 JellyBulletin gives server administrators a rich-text editor for publishing
 news, maintenance notices and other announcements. Every published bulletin is
@@ -37,9 +38,9 @@ control.
 
 | Component | Status | Used for |
 | --- | --- | --- |
-| Jellyfin Server 10.11.11 | Required | Supported server and plugin ABI |
+| Jellyfin Server 12.0 | Required | Supported server and plugin ABI |
 | Jellyfin Web or a web-based Jellyfin client | Required client | Renders the injected home-screen component |
-| [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) | Required | Injects Bulletin into Jellyfin Web |
+| [File Transformation 3.0](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) | Required | Injects Bulletin into Jellyfin Web |
 | [JellySpotlight](https://github.com/skijk/jellyfin-plugin-jellyspotlight) | Optional | Coordinates whether Spotlight rows appear before or after Bulletin |
 
 Native clients that do not render Jellyfin Web are not currently supported.
@@ -93,6 +94,34 @@ For a short, low-profile notice, combine **Adaptive** with a **Compact** or
 **Hidden on home screen** title. Existing bulletins remain **Prominent** until
 changed. The live preview reflects both settings before saving.
 
+## Theme and custom CSS integration
+
+JellyBulletin follows Jellyfin's active palette for its surface, text, accent,
+dividers, controls and shadow. This applies to the home-screen panel, the
+administration editor and its live preview. Themes that provide Jellyfin's
+`--jf-palette-*` variables work automatically.
+
+Custom CSS themes can override individual Bulletin values globally or only on
+the home-screen component:
+
+```css
+:root {
+  --bulletin-accent: #9b7cff;
+  --bulletin-surface: rgba(20, 20, 28, 0.92);
+  --bulletin-text: #f7f5ff;
+  --bulletin-muted: #b8b3c7;
+  --bulletin-divider: rgba(255, 255, 255, 0.14);
+  --bulletin-subtle: rgba(255, 255, 255, 0.07);
+  --bulletin-tint: rgba(155, 124, 255, 0.16);
+  --bulletin-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.3);
+  --bulletin-warning: #f0a000;
+}
+```
+
+All overrides are optional. Setting them on `.jellyfin-bulletin` limits the
+change to the home screen; setting them on `:root` also lets the Bulletin
+administration page and preview inherit the same palette.
+
 ## Updating
 
 Refresh the plugin catalog, install the offered JellyBulletin update and
@@ -111,7 +140,7 @@ directory if you intend to reinstall and retain existing content.
 
 ## Known limitations
 
-- Only Jellyfin 10.11.11 is currently tested.
+- Only Jellyfin 12.0 is currently tested.
 - Support is limited to Jellyfin Web and web-based clients.
 - All published announcements are visible to all authenticated users.
 - Scheduling uses the Jellyfin server clock.
@@ -136,7 +165,7 @@ dotnet build JellyBulletin.sln --configuration Release
 node scripts/validate-assets.mjs
 ```
 
-The project targets .NET 9 and builds against Jellyfin 10.11.11.
+The project targets .NET 10 and builds against Jellyfin 12.0.
 
 Development builds and their test checklist are documented in
 [Development builds](docs/DEVELOPMENT.md).

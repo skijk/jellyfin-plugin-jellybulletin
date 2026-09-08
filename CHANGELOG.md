@@ -2,6 +2,22 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.4.0.0
+
+- Rebuild JellyBulletin for Jellyfin 12.0 final and .NET 10.
+- Support File Transformation 3.0 while retaining the existing injection API.
+- Version the client assets to prevent stale browser cache after upgrading.
+- Include the adaptive layouts and Jellyfin/custom-theme support from the
+  latest development builds.
+
+## 0.3.22.0 — Development
+
+- Follow Jellyfin palette variables for the home-screen panel, editor controls
+  and live preview, including light and custom CSS themes.
+- Remove dark-theme-only borders and backgrounds from the administration page.
+- Add inherited `--bulletin-*` CSS hooks so theme authors can explicitly style
+  Bulletin without replacing its component CSS.
+
 ## 0.3.21.0 — Public beta
 
 - Add an **Adaptive** panel height that follows the displayed content, allowing
