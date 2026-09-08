@@ -7,18 +7,15 @@
     --bulletin-ui-muted: var(--bulletin-muted, var(--jf-palette-text-secondary, color-mix(in srgb, currentColor 62%, transparent)));
     --bulletin-ui-divider: var(--bulletin-divider, var(--jf-palette-divider, color-mix(in srgb, currentColor 14%, transparent)));
     --bulletin-ui-subtle: var(--bulletin-subtle, var(--jf-palette-action-hover, color-mix(in srgb, currentColor 7%, transparent)));
-    --bulletin-ui-tint: var(--bulletin-tint, color-mix(in srgb, var(--bulletin-ui-accent) 18%, transparent));
-    --bulletin-ui-shadow: var(--bulletin-shadow, var(--jf-shadows-8, 0 .75rem 2rem color-mix(in srgb, #000 22%, transparent)));
+    --bulletin-ui-shadow: var(--bulletin-shadow, none);
     box-sizing: border-box;
     width: calc(100% - 2rem);
     max-width: 90rem;
     margin: 1.25rem auto 2rem;
     overflow: hidden;
     border: 1px solid var(--bulletin-ui-divider);
-    border-radius: 1rem;
-    background:
-        radial-gradient(circle at 100% 0, var(--bulletin-ui-tint), transparent 42%),
-        var(--bulletin-ui-surface);
+    border-radius: .75rem;
+    background: var(--bulletin-ui-surface);
     box-shadow: var(--bulletin-ui-shadow);
     color: var(--bulletin-ui-text);
 }
@@ -216,9 +213,9 @@
     width: 2.15rem;
     height: 2.15rem;
     padding: 0;
-    border: 1px solid var(--bulletin-ui-divider);
+    border: 1px solid transparent;
     border-radius: 50%;
-    background: var(--bulletin-ui-subtle);
+    background: transparent;
     color: var(--bulletin-ui-text);
     font-size: 1.55rem;
     line-height: 1;
@@ -227,8 +224,8 @@
 
 .bulletin-arrow:hover,
 .bulletin-arrow:focus-visible {
-    border-color: var(--bulletin-ui-accent);
-    background: var(--bulletin-ui-tint);
+    border-color: var(--bulletin-ui-divider);
+    background: var(--bulletin-ui-subtle);
 }
 
 .bulletin-pause {
@@ -249,7 +246,7 @@
 @media (max-width: 600px) {
     .jellyfin-bulletin {
         margin-inline: 1rem;
-        border-radius: .8rem;
+        border-radius: .6rem;
     }
 
     .bulletin-content {
