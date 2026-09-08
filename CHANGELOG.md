@@ -2,6 +2,13 @@
 
 All notable changes to JellyBulletin are documented here.
 
+## 0.4.1.0
+
+- Replace the accent-tinted radial fade with Jellyfin's neutral surface color.
+- Remove the raised panel shadow for a flatter home-screen appearance.
+- Make navigation buttons transparent until hover or keyboard focus.
+- Reduce corner rounding to better match Jellyfin's surrounding sections.
+
 ## 0.4.0.0
 
 - Rebuild JellyBulletin for Jellyfin 12.0 final and .NET 10.

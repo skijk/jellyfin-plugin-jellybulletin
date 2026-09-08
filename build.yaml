@@ -1,7 +1,7 @@
 ---
 name: "JellyBulletin"
 guid: "6ad77d9a-e157-4ca2-82e7-a114f86a5f50"
-version: "0.4.0.0"
+version: "0.4.1.0"
 targetAbi: "12.0.0.0"
 framework: "net10.0"
 overview: "Announcements for Jellyfin Web. Requires File Transformation."
@@ -14,4 +14,4 @@ owner: "SKYNET"
 artifacts:
 - "Jellyfin.Plugin.JellyBulletin.dll"
 - "logo.png"
-changelog: "Rebuild JellyBulletin for Jellyfin 12.0 final and File Transformation 3.0."
+changelog: "Use a neutral flat Jellyfin surface without accent fading or a raised panel shadow."
